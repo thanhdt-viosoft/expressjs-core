@@ -4,6 +4,12 @@ const fs = require('fs');
 
 const app = express();
 
+Error.create = (code, msg) => {
+    let err = new Error(msg);
+    err.status = code;
+    return err;
+};
+
 global.appconfig = require('./src/appconfig');
 
 global.app = app;
@@ -14,6 +20,10 @@ files.map((f) => {
         require(`./src/controller/${f}`);
     } 
 });
+app.use((err, req, res, next) => {
+    res.status(err.status || 500).send(err.message);
+});
+
 app.listen(appconfig.listen, () => {
   delete global.app;
   console.log('Listening on %d', appconfig.listen);

@@ -9,10 +9,7 @@
 		name: '',
 		status: 0,
 		plugins: {
-			oauthv2: {
-				_id: single_mode: 0
-				session_expired: 0
-			}
+			
 		}
 	}
 }
