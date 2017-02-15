@@ -1,0 +1,10 @@
+{
+  method: 'POST',
+  url: 'http://localhost:3000/test',
+  requestHeader: {
+    'content-type': 'application/json'
+  },
+  requestBody: {
+    name: 'thanh'
+  }
+}
