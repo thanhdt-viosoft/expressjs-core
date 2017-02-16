@@ -1,8 +1,12 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const cors = require('cors')
 
 const app = express();
+
+app.use(cors());
+// app.options('*', cors())
 
 Error.create = (code, msg) => {
     let err = new Error(msg);
