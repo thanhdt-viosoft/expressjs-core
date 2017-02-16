@@ -8,7 +8,7 @@ const checker = require('../checker');
 /************************************
  ** SERVICE:      projectController
  ** AUTHOR:       Unknown
- ** CREATED DATE: 2/16/2017, 12:50:30 AM
+ ** CREATED DATE: 2/16/2017, 2:09:50 PM
  *************************************/
 
 exports = module.exports = {
@@ -21,7 +21,6 @@ exports = module.exports = {
 		FIND: 4,
 	},
 	validate(item, action) {
-		let msg;
 		switch (action) {
 			case exports.VALIDATE.INSERT:
 				item._id = db.uuid();
@@ -32,13 +31,15 @@ exports = module.exports = {
 				checker.must('_id', item.plugins.oauthv2._id, db.Uuid);
 				checker.must('single_mode', item.plugins.oauthv2.single_mode, Boolean);
 				checker.must('session_expired', item.plugins.oauthv2.session_expired, Number);
-				checker.must('mustbe', item.mustbe, Object, {
-					oauthv2: {}
-				});
-				checker.must('oauthv2', item.mustbe.oauthv2, Object);
-				checker.must('_id', item.mustbe.oauthv2._id, db.Uuid);
-				checker.must('single_mode', item.mustbe.oauthv2.single_mode, Boolean);
-				checker.must('session_expired', item.mustbe.oauthv2.session_expired, Number);
+				checker.must('roles', item.roles, Array);
+				checker.must('abc', item.abc, Array, [{
+					username: "thanh"
+				}]);
+				for (abc of item.abc) {
+					checker.must('username', abc.username, String);
+					checker.option('password', abc.password, String);
+				}
+				checker.must('image', item.image, String);
 				item.created_at = new Date();
 				item.updated_at = new Date();
 
@@ -54,13 +55,14 @@ exports = module.exports = {
 						checker.option('session_expired', oauthv2.session_expired, Number);
 					});
 				});
-				checker.option('mustbe', item.mustbe, Object, (mustbe) => {
-					checker.option('oauthv2', mustbe.oauthv2, Object, (oauthv2) => {
-						checker.option('_id', oauthv2._id, db.Uuid);
-						checker.option('single_mode', oauthv2.single_mode, Boolean);
-						checker.option('session_expired', oauthv2.session_expired, Number);
-					});
+				checker.option('roles', item.roles, Array);
+				checker.option('abc', item.abc, Array, (abc) => {
+					for (abc of item.abc) {
+						checker.option('username', abc.username, String);
+						checker.option('password', abc.password, String);
+					}
 				});
+				checker.option('image', item.image, String);
 				item.updated_at = new Date();
 
 				break;
@@ -83,48 +85,63 @@ exports = module.exports = {
 	async find(fil = {}, dbo) {
 		fil = exports.validate(fil, exports.VALIDATE.FIND);
 
-		const dboType = dbo ? db.FAIL : db.DONE;
-		dbo = dbo ? await dbo.change(exports.COLLECTION) : await db.open(exports.COLLECTION);
-		const rs = await dbo.find(fil, dboType);
+		dbo = await db.open(exports.COLLECTION, dbo);
+		const rs = await dbo.find(fil, dbo.isnew ? db.DONE : db.FAIL);
 		return rs;
 	},
 
 	async get(_id, dbo) {
 		_id = exports.validate(_id, exports.VALIDATE.GET);
 
-		const dboType = dbo ? db.FAIL : db.DONE;
-		dbo = dbo ? await dbo.change(exports.COLLECTION) : await db.open(exports.COLLECTION);
-		const rs = await dbo.get(_id, dboType);
+		dbo = await db.open(exports.COLLECTION, dbo);
+		const rs = await dbo.get(_id, dbo.isnew ? db.DONE : db.FAIL);
 		return rs;
 	},
 
 	async insert(item, dbo) {
-		item = exports.validate(item, exports.VALIDATE.INSERT);
+		try {
+			item = exports.validate(item, exports.VALIDATE.INSERT);
 
-		const dboType = dbo ? db.FAIL : db.DONE;
-		dbo = dbo ? await dbo.change(exports.COLLECTION) : await db.open(exports.COLLECTION);
-		const rs = await dbo.insert(item, dboType);
-		return rs;
+			dbo = await db.open(exports.COLLECTION, dbo);
+			const rs = await dbo.insert(item, dbo.isnew ? db.DONE : db.FAIL);
+			return rs;
+		} catch (err) {
+			utils.deleteFiles(utils.getAbsoluteUpload(item.image, `assets/images`), global.appconfig.app.imageResize.product);
+			throw err;
+		}
 	},
 
 	async update(item, dbo) {
-		item = exports.validate(item, exports.VALIDATE.UPDATE);
+		try {
+			item = exports.validate(item, exports.VALIDATE.UPDATE);
 
-		const dboType = dbo ? db.FAIL : db.DONE;
-		dbo = dbo ? await dbo.change(exports.COLLECTION) : await db.open(exports.COLLECTION);
-		const rs = await dbo.update(item, dboType);
-
-		return rs;
+			dbo = await db.open(exports.COLLECTION, dbo);
+			try {
+				const oldItem = await dbo.get(item._id);
+				const rs = await dbo.update(item);
+				utils.deleteFiles(utils.getAbsoluteUpload(oldItem.image, `assets/images`), global.appconfig.app.imageResize.product);
+				return rs;
+			} finally {
+				if (dbo.isnew) await dbo.close();
+			}
+		} catch (err) {
+			utils.deleteFiles(utils.getAbsoluteUpload(item.image, `assets/images`), global.appconfig.app.imageResize.product);
+			throw err;
+		}
 	},
 
 	async delete(_id, dbo) {
 		_id = exports.validate(_id, exports.VALIDATE.DELETE);
 
-		const dboType = dbo ? db.FAIL : db.DONE;
-		dbo = dbo ? await dbo.change(exports.COLLECTION) : await db.open(exports.COLLECTION);
-		const rs = await dbo.delete(_id, dboType);
-
-		return rs;
+		dbo = await db.open(exports.COLLECTION, dbo);
+		try {
+			const item = await dbo.get(_id);
+			const rs = await dbo.delete(_id);
+			utils.deleteFiles(utils.getAbsoluteUpload(item.image, `assets/images`), global.appconfig.app.imageResize.product);
+			return rs;
+		} finally {
+			if (dbo.isnew) await dbo.close();
+		}
 	}
 
 }

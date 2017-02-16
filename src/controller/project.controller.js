@@ -2,15 +2,16 @@ const path = require('path');
 
 const utils = require('../utils');
 const db = require('../db');
+const bodyHandler = require('../body.handler');
 const projectService = require('../service/project.service');
 
 /************************************
  ** CONTROLLER:   projectController
  ** AUTHOR:       Unknown
- ** CREATED DATE: 2/15/2017, 11:52:24 PM
+ ** CREATED DATE: 2/16/2017, 2:09:50 PM
  *************************************/
 
-app.get('/project', utils.jsonHandler(), async(req, res, next) => {
+app.get('/project', async(req, res, next) => {
 	try {
 		let where = {};
 		const rs = await projectService.find({
@@ -22,7 +23,7 @@ app.get('/project', utils.jsonHandler(), async(req, res, next) => {
 	}
 });
 
-app.get('/project/:_id', utils.jsonHandler(), async(req, res, next) => {
+app.get('/project/:_id', async(req, res, next) => {
 	try {
 		const key = db.uuid(req.params._id);
 		const rs = await projectService.get(key);
@@ -32,10 +33,14 @@ app.get('/project/:_id', utils.jsonHandler(), async(req, res, next) => {
 	}
 });
 
-app.post('/project', utils.jsonHandler({
-	name: String,
-	status: Number,
-	plugins: Object
+app.post('/project', bodyHandler.fileHandler({
+	image: {
+		saveTo: "`assets/images`",
+		maxCount: true,
+		returnPath: "`/images/${filename}`",
+		limits: 10000,
+		resize: global.appconfig.app.imageResize.product
+	}
 }), async(req, res, next) => {
 	try {
 		const rs = await projectService.insert(req.body);
@@ -45,10 +50,14 @@ app.post('/project', utils.jsonHandler({
 	}
 })
 
-app.put('/project/:_id', utils.jsonHandler({
-	name: String,
-	status: Number,
-	plugins: Object
+app.put('/project/:_id', bodyHandler.fileHandler({
+	image: {
+		saveTo: "`assets/images`",
+		maxCount: true,
+		returnPath: "`/images/${filename}`",
+		limits: 10000,
+		resize: global.appconfig.app.imageResize.product
+	}
 }), async(req, res, next) => {
 	try {
 		req.body._id = db.uuid(req.params._id);
@@ -59,7 +68,7 @@ app.put('/project/:_id', utils.jsonHandler({
 	}
 })
 
-app.delete('/project/:_id', utils.jsonHandler(), async(req, res, next) => {
+app.delete('/project/:_id', async(req, res, next) => {
 	try {
 		const key = db.uuid(req.params._id);
 		const rs = await projectService.delete(key);

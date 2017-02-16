@@ -10,6 +10,10 @@ Error.create = (code, msg) => {
     return err;
 };
 
+global.FileUpload = (config) => {
+    return config;
+}
+
 global.appconfig = require('./src/appconfig');
 
 global.app = app;
