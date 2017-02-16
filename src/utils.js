@@ -1,5 +1,8 @@
 const _ = require('lodash');
 
+const db = require('./db');
+const microService = require('./service/micro.service');
+
 /************************************
  ** CLASS HELPER
  ** 
@@ -8,7 +11,7 @@ const _ = require('lodash');
 exports = module.exports = _.extend(require('../lib/core/utils'), {
     auth(pathCode, ...actions){
         return async (req, res, next) => {
-            if(!req.headers.token && !req.headers.secret_key) return next(Error.create(401));
+            if(!req.headers.token && !req.headers.secret_key) return next(Error.create(Error.AUTHEN));
             let headers = {                
                 path: pathCode,
                 actions: actions.join(',')
