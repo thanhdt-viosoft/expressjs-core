@@ -1,0 +1,205 @@
+const _ = require('lodash');
+const nodemailer = require('nodemailer');
+
+const db = require('../db');
+const utils = require('../utils');
+const checker = require('../checker');
+const microService = require('./micro.service');
+
+/************************************
+ ** SERVICE:      mailController
+ ** AUTHOR:       Unknown
+ ** CREATED DATE: 2/16/2017, 4:42:00 PM
+ *************************************/
+
+exports = module.exports = {
+	COLLECTION: "mail",
+	VALIDATE: {
+		INSERT: 0,
+		UPDATE: 1,
+		GET: 2,
+		DELETE: 3,
+		FIND: 4,
+	},
+	STATUS: {
+		PENDING: 0,
+		DONE: 1,
+		FAILED: -1
+	},
+	validate(item, action) {
+		switch (action) {
+			case exports.VALIDATE.INSERT:
+				item._id = db.uuid();
+				checker.must('project_id', item.project_id, db.Uuid);
+				checker.must('title', item.title, String);
+				checker.must('content', item.content, String);
+				checker.must('html', item.html, Boolean);
+				checker.must('from', item.from, Object);
+				checker.must('name', item.from.name, String);
+				checker.must('email', item.from.email, String);
+				checker.must('to', item.to, Array);
+				checker.must('cc', item.cc, Array);
+				checker.must('bcc', item.bcc, Array);
+				checker.must('mail_config', item.mail_config, Object);
+				checker.option('attachments', item.attachments, Array, (attachments) => {
+					const fs = require('fs');
+					const path = require('path');
+					for(let attachment of attachments) {
+						checker.must('attachment.name', attachment.name, String);
+						checker.must('attachment.path', attachment.path, String);
+						try {
+							fs.statSync(path.join(__dirname, '..', '..', 'assets', attachment.path));
+						} catch(e){
+							throw Error.create(Error.BAD_REQUEST, `Could not found this file ${attachment.name}`);
+						}
+					}
+				});				
+				checker.must('trying_time', item.trying_time, Number);
+				item.status = checker.must('status', item.status, Number, exports.STATUS.PENDING);
+				item.created_at = new Date();
+				item.updated_at = new Date();
+
+				break;
+			case exports.VALIDATE.GET:
+				checker.must('_id', item._id, db.Uuid);
+				checker.must('project_id', item.project_id, db.Uuid);
+
+				break;
+			case exports.VALIDATE.DELETE:
+				checker.must('_id', item._id, db.Uuid);
+				checker.must('project_id', item.project_id, db.Uuid);
+
+				break;
+			case exports.VALIDATE.FIND:
+
+
+				break;
+		}
+		return item;
+	},
+
+	async schedule(){
+		const listEmail = await exports.find({
+			where: {
+				status: exports.STATUS.PENDING
+			},
+			sort: {
+				updated_at: 1
+			}	
+		});
+		if(listEmail.length > 0) {	
+			const dbo = await db.open(exports.COLLECTION);
+			for(let e of listEmail){
+				if(!e.mail_config) { 
+					e.status = exports.STATUS.FAILED;
+					e.msg = 'Could not found mail config';					
+				}else {					
+					try {
+						await exports.send(e);
+						e.status = exports.STATUS.DONE;
+					}catch(err) {
+						e.trying_time--;
+						if(e.trying_time === 0) e.status = exports.STATUS.FAILED;
+						e.msg = err.toString();
+					}					
+				}
+				await exports.update(e, dbo);
+			}
+			await dbo.close();
+		}
+		setTimeout(exports.schedule, global.appconfig.app.timeout_scan_email);
+	},
+	
+	async send(email){		
+		return new Promise((resolve, reject) => {			
+			email.mail_config.auth.pass = new Buffer(email.mail_config.auth.pass, 'base64').toString('utf8');
+			const transporter = nodemailer.createTransport(email.mail_config);
+			const mailOptions = {
+				from: `"${email.from.name}" <${email.from.email}>`,
+				to: email.to.join(', '),
+				subject: email.title
+			};
+			if(email.attachments) {
+				const path = require('path');
+				mailOptions.attachments = [];
+				for(let a of email.attachments){
+					mailOptions.attachments.push({
+						filename: a.name,
+						path: path.join(__dirname, '..', '..', 'assets', a.path)
+					});
+				}
+			}
+			if(email.cc) mailOptions.cc = email.cc.join(', ');
+			if(email.bcc) mailOptions.bcc = email.bcc.join(', ');
+			if(email.html) mailOptions.html = email.content;
+			else mailOptions.text = email.content;
+			try {
+				transporter.sendMail(mailOptions, (error, info) => {
+					if (error) return reject(error);
+					resolve(info);
+				});
+			}catch(e){
+				reject(e);
+			}			
+		});		
+	},
+
+	async find(fil = {}, dbo) {
+		fil = exports.validate(fil, exports.VALIDATE.FIND);
+
+		dbo = await db.open(exports.COLLECTION, dbo);
+		const rs = await dbo.find(fil, dbo.isnew ? db.DONE : db.FAIL);
+		return rs;
+	},
+
+	async get(_id, dbo) {
+		_id = exports.validate(_id, exports.VALIDATE.GET);
+
+		dbo = await db.open(exports.COLLECTION, dbo);
+		const rs = await dbo.get(_id, dbo.isnew ? db.DONE : db.FAIL);
+		return rs;
+	},
+
+	async insert(item, config_name, auth, dbo) {		
+		const projectConfig = await microService.getConfig(auth, 'mail');			
+		item.trying_time = projectConfig.trying_time;
+		item.mail_config = projectConfig.accounts[config_name];
+
+		item = exports.validate(item, exports.VALIDATE.INSERT);
+
+		dbo = await db.open(exports.COLLECTION, dbo);
+		const rs = await dbo.insert(item, dbo.isnew ? db.DONE : db.FAIL);
+		return rs;
+	},
+
+	async update(item, dbo) {
+		item = exports.validate(item, exports.VALIDATE.UPDATE);
+
+		dbo = await db.open(exports.COLLECTION, dbo);
+		const rs = await dbo.update(item, dbo.isnew ? db.DONE : db.FAIL);
+
+		return rs;
+	},
+
+	async delete(_id, dbo) {
+		_id = exports.validate(_id, exports.VALIDATE.DELETE);
+
+		dbo = await db.open(exports.COLLECTION, dbo);
+		try {
+			const item = await dbo.get(_id);
+			if(item.status !== exports.STATUS.PENDING) throw Error.create(Error.CONDITION, "Could not delete email with status != pending");
+			const rs = await dbo.delete(_id);
+			if(item.attachments && item.attachments.length > 0) {
+				utils.deleteFiles(utils.getAbsoluteUpload(item.attachments.map((e) => {
+					return e.path;
+				}), `assets/attachments`));			
+			}
+			return rs;
+		} finally {
+			if (dbo.isnew) await dbo.close();
+		}
+
+		return rs;
+	}
+
+}
