@@ -1,0 +1,57 @@
+{
+	des: 'Add',
+	method: 'POST',
+	url: 'http://localhost:9605/log',
+	requestHeader: {
+		'content-type': 'application/json',
+		secret_key: '589d95c4c392f347c4d3c9f9'
+	},
+	requestBody: {
+		event_type: 10,
+		name: "ADD"
+	}
+}
+
+{
+	des: 'UPDATE',
+	method: 'PUT',
+	url: 'http://localhost:9605/log',
+	requestHeader: {
+		'content-type': 'application/json',
+		secret_key: '589d95c4c392f347c4d3c9f9'
+	},
+	requestBody: {
+		event_type: 10,
+		name: "ADD"
+	}
+}
+
+{
+	des: 'Get list',
+	method: 'GET',
+	url: 'http://localhost:9605/log?q={"name": "ADD"}',
+	requestHeader: {
+		'content-type': 'application/json',
+		secret_key: '589d95c4c392f347c4d3c9f9'
+	}
+}
+
+{
+	des: 'Get detail',
+	method: 'GET',
+	url: 'http://localhost:9605/log/58a56b4f7086de43741d002c',
+	requestHeader: {
+		'content-type': 'application/json',
+		secret_key: '589d95c4c392f347c4d3c9f9'
+	}
+}
+
+{
+	des: 'Delete',
+	method: 'DELETE',
+	url: 'http://localhost:9605/log/58a56bc90e2bfd4af0535470',
+	requestHeader: {
+		'content-type': 'application/json',
+		secret_key: '589d95c4c392f347c4d3c9f9'
+	}
+}
