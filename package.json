@@ -1,12 +1,20 @@
 {
   "name": "expressjs-core",
   "version": "1.0.0",
+  "description": "It base on expressjs. It help us easy to generate APIs by using configuration file",
+  "main": "index.js",
   "scripts": {
     "start": "node --harmony-async-await index.js",
     "test": "node --harmony-async-await test.js",
     "gen": "node ./lib/generate/gen.js",
     "pm2": "pm2 start index.js --node-args=\"--harmony-async-await\" --name expressjs-core"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/just4developments/expressjs-core/tree/master"
+  },
+  "author": "just4developments@gmail.com",
+  "license": "ISC",
   "dependencies": {
     "body-parser": "^1.16.1",
     "express": "^5.0.0-alpha.3",
