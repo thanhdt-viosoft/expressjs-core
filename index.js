@@ -8,6 +8,11 @@ const app = express();
 app.use(cors());
 // app.options('*', cors())
 
+Error.NOT_FOUND = 404;
+Error.EXPIRED = 440;
+Error.AUTHEN = 401;
+Error.AUTHORIZ = 403;
+Error.INTERNAL = 500;
 Error.create = (code, msg) => {
     let err = new Error(msg);
     err.status = code;
