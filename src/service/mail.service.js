@@ -80,10 +80,10 @@ exports = module.exports = {
 
 	async schedule(){
 		const listEmail = await exports.find({
-			where: {
+			$where: {
 				status: exports.STATUS.PENDING
 			},
-			sort: {
+			$sort: {
 				updated_at: 1
 			}	
 		});

@@ -16,8 +16,8 @@ app.get('/mail', utils.auth('plugin.mail>mail', 'FIND'), async(req, res, next) =
 		let where = req.query.q ? JSON.parse(req.query.q) : {};
 		where.project_id = req.auth.projectId;
 		const rs = await mailService.find({
-			where: where,
-			sort: {
+			$where: where,
+			$sort: {
 				updated_at: 1
 			}
 		});
