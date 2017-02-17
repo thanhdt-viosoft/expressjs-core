@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node --harmony-async-await index.js",
     "test": "node --harmony-async-await test.js",
+    "check": "nsp check",
     "gen": "node ./lib/generate/gen.js",
-    "pm2": "pm2 start index.js --node-args=\"--harmony-async-await\" --name expressjs-core"
+    "pm2": "pm2 start pm2.config.js"
   },
   "repository": {
     "type": "git",

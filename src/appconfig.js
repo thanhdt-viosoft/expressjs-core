@@ -1,7 +1,8 @@
-module.exports = {
+global.appconfig = {
+  name: 'expressjs',
   listen: 3000,
   db: {
-      url: 'mongodb://localhost:27017/restify-core'
+      url: 'mongodb://localhost:27017/expressjs-core'
   },
   app: {
     imageResize: {
