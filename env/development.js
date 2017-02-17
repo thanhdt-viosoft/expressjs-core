@@ -3,6 +3,6 @@ const cachedService = require('../src/service/cached.service');
 
 console.log('This is development mode');
 app.all('/*', (req, res, next) => {
-    console.log(db.info(), cachedService.info());    
+    console.log('-', `Mongo: ${db.size()}`, `Cached: ${cachedService.size()}`);
     next();
 });
