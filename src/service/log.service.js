@@ -37,11 +37,13 @@ exports = module.exports = {
 
 				break;
 			case exports.VALIDATE.GET:
-				item = checker.must('_id', item, db.Uuid);
+				checker.must('_id', item._id, db.Uuid);
+				checker.must('project_id', item.project_id, db.Uuid);
 
 				break;
 			case exports.VALIDATE.DELETE:
-				item = checker.must('_id', item, db.Uuid);
+				checker.must('_id', item._id, db.Uuid);
+				checker.must('project_id', item.project_id, db.Uuid);
 
 				break;
 			case exports.VALIDATE.FIND:

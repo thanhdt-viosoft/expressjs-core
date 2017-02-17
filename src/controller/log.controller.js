@@ -16,8 +16,8 @@ app.get('/log', utils.auth('plugin.log>log', 'FIND'), async(req, res, next) => {
 		let where = req.query.q ? JSON.parse(req.query.q) : {};		
 		where.project_id = req.auth.projectId;		
 		const rs = await logService.find({
-			where: where,
-			fields: {
+			$where: where,
+			$fields: {
 				project_id: 0
 			}
 		});
@@ -30,11 +30,11 @@ app.get('/log', utils.auth('plugin.log>log', 'FIND'), async(req, res, next) => {
 app.get('/log/:_id', utils.auth('plugin.log>log', 'GET'), async(req, res, next) => {
 	try {
 		const rs = await logService.get({
-			where: {
+			$where: {
 				_id: db.uuid(req.params._id),
 				project_id: req.auth.projectId
 			}, 
-			fields: {
+			$fields: {
 				project_id: 0
 			}
 		});
