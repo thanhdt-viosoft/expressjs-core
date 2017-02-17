@@ -1,6 +1,6 @@
 module.exports = {
   apps : [{
-    name        : "mcro-core",
+    name        : "mcro-mail",
     script      : "./index.js",
     watch       : false,
     node_args: "--harmony-async-await",

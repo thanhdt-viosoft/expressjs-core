@@ -1,8 +1,8 @@
 global.appconfig = {
-    name: 'plugin.core',
-    listen: 9002,
+    name: 'plugin.mail',
+    listen: 9602,
     db: {
-        url: 'mongodb://localhost:27017/core'
+        url: 'mongodb://localhost:27017/mail'
     },
     auth: {
         url: 'http://localhost:9600'

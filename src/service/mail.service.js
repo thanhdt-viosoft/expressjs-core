@@ -78,33 +78,39 @@ exports = module.exports = {
 		return item;
 	},
 
-	async schedule(){
-		const listEmail = await exports.find({
-			$where: {
-				status: exports.STATUS.PENDING
-			},
-			$sort: {
-				updated_at: 1
-			}	
-		});
-		if(listEmail.length > 0) {	
-			const dbo = await db.open(exports.COLLECTION);
-			for(let e of listEmail){
-				if(!e.mail_config) { 
-					e.status = exports.STATUS.FAILED;
-					e.msg = 'Could not found mail config';					
-				}else {					
-					try {
-						await exports.send(e);
-						e.status = exports.STATUS.DONE;
-					}catch(err) {
-						e.trying_time--;
-						if(e.trying_time === 0) e.status = exports.STATUS.FAILED;
-						e.msg = err.toString();
-					}					
-				}
-				await exports.update(e, dbo);
+	async schedule() {
+		const dbo = await db.open(exports.COLLECTION);
+		try {
+			const listEmail = await dbo.find({
+				$where: {
+					status: exports.STATUS.PENDING
+				},
+				$sort: {
+					updated_at: 1
+				}	
+			});
+			if(listEmail.length > 0) {			
+				for(let e of listEmail){
+					if(!e.mail_config) { 
+						e.status = exports.STATUS.FAILED;
+						e.msg = 'Could not found mail config';					
+					}else {					
+						try {
+							await exports.send(e);
+							e.status = exports.STATUS.DONE;
+						}catch(err) {
+							e.trying_time--;
+							if(e.trying_time === 0) e.status = exports.STATUS.FAILED;
+							e.msg = err.toString();
+						}					
+					}
+					await dbo.update(e);
+				}			
 			}
+		} catch(err){
+			console.error('Schedule mail sending got problem', err);
+			throw err;
+		} finally{
 			await dbo.close();
 		}
 		setTimeout(exports.schedule, global.appconfig.app.timeout_scan_email);
@@ -169,15 +175,6 @@ exports = module.exports = {
 
 		dbo = await db.open(exports.COLLECTION, dbo);
 		const rs = await dbo.insert(item, dbo.isnew ? db.DONE : db.FAIL);
-		return rs;
-	},
-
-	async update(item, dbo) {
-		item = exports.validate(item, exports.VALIDATE.UPDATE);
-
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.update(item, dbo.isnew ? db.DONE : db.FAIL);
-
 		return rs;
 	},
 
