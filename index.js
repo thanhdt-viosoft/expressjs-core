@@ -30,5 +30,6 @@ app.use((err, req, res, next) => {
 
 app.listen(appconfig.listen, () => {
   delete global.app;
+  require('./src/service/_startup');
   console.log('Listening on %d', appconfig.listen);
 });
