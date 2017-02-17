@@ -54,7 +54,7 @@ exports = module.exports = _.extend(require('../lib/core/utils'), {
             if(req.headers.token) headers.token = req.headers.token;
             else if(req.headers.secret_key) headers.secret_key = req.headers.secret_key;
             const resp = await microService.checkAuthoriz(headers);
-            if(resp.code !== 200) return next(Error.create(resp.code, resp.body));
+            if(resp.code !== 200) return next(Error.create(resp.code, resp.error.message));
             const token = resp.headers.token.split('-');
             req.auth = {
                 projectId: db.uuid(token[0]),

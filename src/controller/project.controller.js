@@ -13,7 +13,7 @@ const projectService = require('../service/project.service');
 
 app.get('/project', utils.auth(`${global.appconfig.name}>project`, 'FIND'), async(req, res, next) => {
 	try {		
-		if(projectService.ROOT_PROJECT_ID !== req.auth.projectId) {
+		if(projectService.ROOT_PROJECT_ID.toString() !== req.auth.projectId.toString()) {
 			const rs = await projectService.get({
 				_id: req.auth.projectId
 			});
@@ -36,9 +36,18 @@ app.get('/project', utils.auth(`${global.appconfig.name}>project`, 'FIND'), asyn
 
 app.get('/project/:_id', utils.auth(`${global.appconfig.name}>project`, 'GET'), async(req, res, next) => {	
 	try {
-		if(projectService.ROOT_PROJECT_ID !== req.auth.projectId) throw Error.create(ERROR.AUTHORIZ);
+		if(projectService.ROOT_PROJECT_ID.toString() !== req.auth.projectId.toString()) throw Error.create(Error.AUTHORIZ);
 		const key = db.uuid(req.params._id);
 		const rs = await projectService.get(key);
+		res.send(rs);
+	} catch (err) {
+		next(err);
+	}
+});
+
+app.get('/project-config', utils.auth(`${global.appconfig.name}>project`, 'GET_CONFIG'), async(req, res, next) => {
+	try {
+		const rs = await projectService.getConfig(req.auth.projectId, req.query.plugin);
 		res.send(rs);
 	} catch (err) {
 		next(err);
@@ -50,9 +59,22 @@ app.post('/project', utils.auth(`${global.appconfig.name}>project`, 'ADD'), body
 	status: Number,
 	plugins: Object
 }), async(req, res, next) => {
-	try {
-		if(projectService.ROOT_PROJECT_ID !== req.auth.projectId) throw Error.create(ERROR.AUTHORIZ);
+	try {req.auth.projectId.toString()
+		if(projectService.ROOT_PROJECT_ID.toString() !== req.auth.projectId.toString()) throw Error.create(Error.AUTHORIZ);
 		const rs = await projectService.insert(req.body);
+		res.send(rs);
+	} catch (err) {
+		next(err);
+	}
+});
+
+app.put('/project', bodyHandler.jsonHandler({
+    name: String,
+    plugins: Object
+}), utils.auth(`${global.appconfig.name}>project`, 'UPDATE'), async(req, res, next) => {
+	try {
+		req.body._id = req.auth.projectId;
+		const rs = await projectService.update(req.body);
 		res.send(rs);
 	} catch (err) {
 		next(err);
@@ -65,7 +87,7 @@ app.put('/project/:_id', utils.auth(`${global.appconfig.name}>project`, 'UPDATE'
 	plugins: Object
 }), async(req, res, next) => {
 	try {
-		if(projectService.ROOT_PROJECT_ID !== req.auth.projectId) throw Error.create(ERROR.AUTHORIZ);
+		if(projectService.ROOT_PROJECT_ID.toString() !== req.auth.projectId.toString()) throw Error.create(Error.AUTHORIZ);
 		req.body._id = db.uuid(req.params._id);
 		const rs = await projectService.update(req.body);
 		res.send(rs);
@@ -76,7 +98,7 @@ app.put('/project/:_id', utils.auth(`${global.appconfig.name}>project`, 'UPDATE'
 
 app.delete('/project/:_id', utils.auth(`${global.appconfig.name}>project`, 'DELETE'), async(req, res, next) => {
 	try {
-		if(projectService.ROOT_PROJECT_ID !== req.auth.projectId) throw Error.create(ERROR.AUTHORIZ);
+		if(projectService.ROOT_PROJECT_ID.toString() !== req.auth.projectId.toString()) throw Error.create(Error.AUTHORIZ);
 		const key = db.uuid(req.params._id);
 		const rs = await projectService.delete(key);
 		res.send(rs);

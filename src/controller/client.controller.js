@@ -19,7 +19,7 @@ app.post('/login', bodyHandler.jsonHandler({
 		req.body.project_id = db.uuid(req.headers.pj);
 		if (req.headers.app) req.body.app = req.headers.app;		
 		const accountService = require('../service/account.service');
-		const token = await accountService.login(body);
+		const token = await accountService.login(req.body);
 		res.header('token', token);
 		res.end();
 	} catch (err) {
@@ -50,12 +50,18 @@ app.head('/ping', utils.authHandler(), async(req, res, next) => {
 	}
 });
 
-app.post('/upload-image', utils.authHandler(true), bodyHandler.fileHandler({
+app.post('/upload-image', async (req, res, next) => {
+	if(!req.headers.pj) return next(Error.create(Error.AUTHORIZ, 'Got no permission to upload'));
+	const projectService = require('../service/project.service');
+	const project = await projectService.get(db.uuid(req.headers.pj));
+	if(!project) return next(Error.create(Error.AUTHORIZ, 'Got no permission to upload.'));
+	next();
+}, bodyHandler.fileHandler({
 	file: {
-		saveTo: "`assets/upload/${req.auth.projectId}/`",
+		saveTo: "`assets/upload/${req.headers.pj}/`",
 		maxCount: 1,
 		isFull: false,
-		returnPath: "`/upload/${req.auth.projectId}/${filename}`",
+		returnPath: "`/upload/${req.headers.pj}/${filename}`",
 		limits: 10000
 	}
 }), async(req, res, next) => {
@@ -64,31 +70,7 @@ app.post('/upload-image', utils.authHandler(true), bodyHandler.fileHandler({
 	} catch (err) {
 		next(err);
 	}
-})
-
-app.get('/project-config', utils.authHandler(true), async(req, res, next) => {
-	try {
-		const projectService = require('../service/project.service');
-		const rs = await projectService.getConfig(req.auth.projectId, req.query.plugin);
-		res.send(rs);
-	} catch (err) {
-		next(err);
-	}
 });
-
-app.put('/project', bodyHandler.jsonHandler({
-    name: String,
-    plugins: Object
-}), utils.authHandler(true), async(req, res, next) => {
-	try {
-		req.body._id = req.auth.projectId;
-		const projectService = require('../service/project.service');
-		const rs = await projectService.update(req.body);
-		res.send(rs);
-	} catch (err) {
-		next(err);
-	}
-})
 
 app.get('/me', utils.authHandler(true), async(req, res, next) => {
 	try {

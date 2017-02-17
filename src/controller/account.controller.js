@@ -74,7 +74,10 @@ app.put('/account/:_id', utils.auth(`${global.appconfig.name}>account`, 'UPDATE'
 	more: Object
 }), async(req, res, next) => {
 	try {
-		req.body._id = db.uuid(req.params._id);
+		req.body._id = {
+			_id: db.uuid(req.params._id),
+			project_id: req.auth.projectId
+		};
 		const rs = await accountService.update(req.body);
 		res.send(rs);
 	} catch (err) {

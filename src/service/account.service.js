@@ -64,8 +64,8 @@ exports = module.exports = {
 
 				break;
 			case exports.VALIDATE.UPDATE:
-				checker.must('_id', item._id, db.Uuid);
-				checker.option('project_id', item.project_id, db.Uuid);
+				checker.must('_id', item._id._id, db.Uuid);
+				checker.option('project_id', item._id.project_id, db.Uuid);
 				checker.option('role_ids', item.role_ids, Array, (role_ids) => {
 					for (role_ids of item.role_ids) {
 						checker.must('role_ids', role_ids, db.Uuid);
@@ -135,6 +135,7 @@ exports = module.exports = {
 				$where: where,
 				$fields: { token: 1, status: 1, _id: 1, project_id: 1, role_ids: 1 }
 			});
+			if(!user) throw Error.create(Error.NOT_FOUND, `Could not found username ${item.username}`);
 			exports.validate({userClient: item, userServer: user}, exports.VALIDATE.LOGIN);			
 			const projectService = require('./project.service');
 			cached = cachedService.open();
@@ -157,8 +158,8 @@ exports = module.exports = {
 		try {
 			const user = await exports.getCached(auth.secretToken, cached);
 			if(!user) throw Error.create(Error.EXPIRED, 'Session was expired');
-			const roleService = require('./role.service');
-			const roles = await roleService.getCached(auth.projectId, cached);
+			const roleService = require('./role.service');auth.projectId.toString()
+			const roles = await roleService.getCached(auth.projectId, cached) || [];
 			for(let role of roles){
 				for(let r of role.api) {
 					if(new RegExp(`^${r.path}$`, 'gi').test(auth.path) && _.some(auth.actions, (a) => {

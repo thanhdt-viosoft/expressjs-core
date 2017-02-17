@@ -117,8 +117,42 @@ exports = module.exports = {
 		item = exports.validate(item, exports.VALIDATE.INSERT);
 
 		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.insert(item, dbo.isnew ? db.DONE : db.FAIL);
-		return rs;
+		try {
+			const rs = await dbo.insert(item);
+			
+			const roleService = require('./role.service');
+			const eycrypt = require('../../lib/core/encrypt');
+			const accountService = require('./account.service');
+
+			const role = await roleService.insert({
+				project_id: rs._id,
+				name: 'Admin',
+				api: [{
+					path: '.*',
+					actions: ['.*']
+				}],
+				web: [{
+					path: '.*',
+					actions: ['.*']
+				}],
+				mob: [{
+					path: '.*',
+					actions: ['.*']
+				}]
+			}, dbo);	
+			const account = accountService.insert({
+				project_id: rs._id,
+				username: 'admin',
+				password: eycrypt.md5('admin!@#$%'),
+				status: 1,
+				recover_by: 'admin@email.com',
+				role_ids: [role._id],
+				more: {}
+			}, dbo);
+			return rs;
+		} finally{
+			if(dbo.isnew) await dbo.close();
+		}
 	},
 
 	async update(item, dbo) {

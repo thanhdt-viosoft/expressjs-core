@@ -3,10 +3,11 @@
 	method: 'POST',
 	url: 'http://localhost:9600/project',
 	requestHeader: {
-		'content-type': 'application/json'
+		'content-type': 'application/json',
+		secret_key: '589d95c4c392f347c4d3c9f9'
 	},
 	requestBody: {
-		name: 'Root Project',
+		name: 'Thanh 1 PRoject',
 		status: 1,
 		plugins: {
 			oauthv2: {

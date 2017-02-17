@@ -8,7 +8,7 @@ global.appconfig = {
         url: 'http://localhost:9600'
     },
     app: {
-        rootProjectId: '589c3cd29971853aa803b264'
+        rootProjectId: '58997ac77e9a4435508973bf'
     },
     cache: {
         redis: {
