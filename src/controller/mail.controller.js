@@ -11,7 +11,7 @@ const mailService = require('../service/mail.service');
  ** CREATED DATE: 2/16/2017, 4:42:00 PM
  *************************************/
 
-app.get('/mail', utils.auth('plugin.mail>mail', 'FIND'), async(req, res, next) => {
+app.get('/mail', utils.auth(`${global.appconfig.name}>mail`, 'FIND'), async(req, res, next) => {
 	try {
 		let where = req.query.q ? JSON.parse(req.query.q) : {};
 		where.project_id = req.auth.projectId;
@@ -27,7 +27,7 @@ app.get('/mail', utils.auth('plugin.mail>mail', 'FIND'), async(req, res, next) =
 	}
 });
 
-app.get('/mail/:_id', utils.auth('plugin.mail>mail', 'GET'), async(req, res, next) => {
+app.get('/mail/:_id', utils.auth(`${global.appconfig.name}>mail`, 'GET'), async(req, res, next) => {
 	try {
 		const key = {
 			_id: db.uuid(req.params._id),
@@ -71,7 +71,7 @@ app.post('/mail', bodyHandler.jsonHandler({
 	bcc: Array,
 	attachments: Array,
 	config_name: String
-}), utils.auth('plugin.mail>mail', 'ADD'), async(req, res, next) => {
+}), utils.auth(`${global.appconfig.name}>mail`, 'ADD'), async(req, res, next) => {
 	try {
 		req.body.project_id = req.auth.projectId;
 		const rs = await mailService.insert(req.body, req.body.config_name, req.auth);
@@ -81,7 +81,7 @@ app.post('/mail', bodyHandler.jsonHandler({
 	}
 })
 
-app.delete('/mail/:_id', utils.auth('plugin.mail>mail', 'DELETE'), async(req, res, next) => {
+app.delete('/mail/:_id', utils.auth(`${global.appconfig.name}>mail`, 'DELETE'), async(req, res, next) => {
 	try {
 		const key = {
 			_id: db.uuid(req.params._id),

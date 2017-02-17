@@ -1,6 +1,7 @@
 const mailService = require('./mail.service');
 
-var main = async () => {        
+var main = async () => {   
+    console.log("Start mail sending service");
     mailService.schedule();
 };
 
