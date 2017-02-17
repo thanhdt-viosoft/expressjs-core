@@ -1,4 +1,5 @@
-module.exports = {
+global.appconfig = {
+    name: 'mcro-core',
     listen: 9002,
     db: {
         url: 'mongodb://localhost:27017/mail'
@@ -9,4 +10,4 @@ module.exports = {
     app: {
         
     }
-}
+};
