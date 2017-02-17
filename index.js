@@ -1,29 +1,20 @@
+require('./declare');
+require('./src/appconfig');
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const cors = require('cors')
+const cors = require('cors');
 
 const app = express();
 
-app.use(cors());
-// app.options('*', cors())
+app.disable('etag');
+app.disable('x-powered-by');
 
-Error.NOT_FOUND = 404;
-Error.EXPIRED = 440;
-Error.AUTHEN = 401;
-Error.AUTHORIZ = 403;
-Error.INTERNAL = 500;
-Error.create = (code, msg) => {
-    let err = new Error(msg);
-    err.status = code;
-    return err;
-};
+app.use(cors());
 
 global.FileUpload = (config) => {
     return config;
 }
-
-global.appconfig = require('./src/appconfig');
 
 global.app = app;
 
