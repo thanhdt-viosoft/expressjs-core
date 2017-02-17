@@ -11,7 +11,7 @@ const logService = require('../service/log.service');
  ** CREATED DATE: 2/16/2017, 3:49:05 PM
  *************************************/
 
-app.get('/log', utils.auth('plugin.log>log', 'FIND'), async(req, res, next) => {
+app.get('/log', utils.auth(`${global.appconfig.name}>log`, 'FIND'), async(req, res, next) => {
 	try {
 		let where = req.query.q ? JSON.parse(req.query.q) : {};		
 		where.project_id = req.auth.projectId;		
@@ -19,6 +19,9 @@ app.get('/log', utils.auth('plugin.log>log', 'FIND'), async(req, res, next) => {
 			$where: where,
 			$fields: {
 				project_id: 0
+			},
+			$sort: {
+				updated_at: -1
 			}
 		});
 		res.send(rs);
@@ -27,7 +30,7 @@ app.get('/log', utils.auth('plugin.log>log', 'FIND'), async(req, res, next) => {
 	}
 });
 
-app.get('/log/:_id', utils.auth('plugin.log>log', 'GET'), async(req, res, next) => {
+app.get('/log/:_id', utils.auth(`${global.appconfig.name}>log`, 'GET'), async(req, res, next) => {
 	try {
 		const rs = await logService.get({
 			$where: {
@@ -44,8 +47,12 @@ app.get('/log/:_id', utils.auth('plugin.log>log', 'GET'), async(req, res, next) 
 	}
 });
 
-app.post('/log', bodyHandler.jsonHandler(), utils.auth('plugin.log>log', 'ADD'), async(req, res, next) => {
+app.post('/log', bodyHandler.jsonHandler(), utils.auth(`${global.appconfig.name}>log`, 'ADD'), async(req, res, next) => {
 	try {
+		if(!_.isPlainObject(req.body) || Object.keys(req.body).length === 0) throw Error.create(Error.BAD_REQUEST, 'Data is required');
+		delete req.body.created_at;
+		delete req.body.updated_at;
+
 		let body = {};
 		body.project_id = req.auth.projectId;
 		body.account_id = req.auth.accountId;
@@ -57,15 +64,17 @@ app.post('/log', bodyHandler.jsonHandler(), utils.auth('plugin.log>log', 'ADD'),
 	}
 });
 
-app.put('/log/:_id', bodyHandler.jsonHandler(), utils.auth('plugin.log>log', 'UPDATE'), async(req, res, next) => {
+app.put('/log/:_id', bodyHandler.jsonHandler(), utils.auth(`${global.appconfig.name}>log`, 'UPDATE'), async(req, res, next) => {
 	try {
+		if(!_.isPlainObject(req.body) || Object.keys(req.body).length === 0) throw Error.create(Error.BAD_REQUEST, 'Data is required');
+		delete req.body.created_at;
+		delete req.body.updated_at;
+
 		let body = {};
 		body._id = {
 			_id: db.uuid(req.params._id),
 			project_id: req.auth.projectId
 		};
-		body.project_id = req.auth.projectId;
-		body.account_id = req.auth.accountId;		
 		if (req.body) body = _.merge({}, req.body, body);
 		const rs = await logService.update(body);
 		res.send(rs);
@@ -74,7 +83,7 @@ app.put('/log/:_id', bodyHandler.jsonHandler(), utils.auth('plugin.log>log', 'UP
 	}
 });
 
-app.delete('/log/:_id', utils.auth('plugin.log>log', 'DELETE'), async(req, res, next) => {
+app.delete('/log/:_id', utils.auth(`${global.appconfig.name}>log`, 'DELETE'), async(req, res, next) => {
 	try {
 		const rs = await logService.delete({
 			_id: db.uuid(req.params._id),

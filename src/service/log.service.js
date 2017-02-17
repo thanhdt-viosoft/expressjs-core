@@ -30,9 +30,8 @@ exports = module.exports = {
 
 				break;
 			case exports.VALIDATE.UPDATE:
-				checker.must('_id', item._id, db.Uuid);
-				checker.option('project_id', item.project_id, db.Uuid);
-				checker.option('account_id', item.account_id, db.Uuid);
+				checker.must('_id', item._id._id, db.Uuid);
+				checker.must('project_id', item._id.project_id, db.Uuid);
 				item.updated_at = new Date();
 
 				break;
@@ -47,7 +46,6 @@ exports = module.exports = {
 
 				break;
 			case exports.VALIDATE.FIND:
-
 
 				break;
 		}
