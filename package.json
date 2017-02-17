@@ -25,8 +25,8 @@
     "express": "^5.0.0-alpha.3",
     "lodash": "^4.17.2",
     "mongodb": "^2.2.22",
-    "node-uuid": "^1.4.7",
-    "unirest": "^0.5.1"
+    "unirest": "^0.5.1",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "js-beautify": "^1.6.4"
