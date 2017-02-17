@@ -10,7 +10,9 @@ const app = express();
 app.disable('etag');
 app.disable('x-powered-by');
 
-app.use(cors());
+app.use(cors({
+    exposedHeaders: ['token']
+}));
 
 global.FileUpload = (config) => {
     return config;

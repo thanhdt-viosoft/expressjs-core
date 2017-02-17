@@ -59,7 +59,7 @@ app.post('/project', utils.auth(`${global.appconfig.name}>project`, 'ADD'), body
 	status: Number,
 	plugins: Object
 }), async(req, res, next) => {
-	try {req.auth.projectId.toString()
+	try {
 		if(projectService.ROOT_PROJECT_ID.toString() !== req.auth.projectId.toString()) throw Error.create(Error.AUTHORIZ);
 		const rs = await projectService.insert(req.body);
 		res.send(rs);

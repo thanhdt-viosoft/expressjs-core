@@ -75,7 +75,7 @@ app.post('/upload-image', async (req, res, next) => {
 app.get('/me', utils.authHandler(true), async(req, res, next) => {
 	try {
 		const accountService = require('../service/account.service');
-		const rs = await accountService.get({
+		const rs = await accountService.getMe({
 			$where: {
 				_id: req.auth.accountId,
                 project_id: req.auth.projectId

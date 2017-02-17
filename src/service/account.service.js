@@ -133,10 +133,12 @@ exports = module.exports = {
 		try {
 			const user = await dbo.get({
 				$where: where,
-				$fields: { token: 1, status: 1, _id: 1, project_id: 1, role_ids: 1 }
+				$fields: { password: 1, app: 1, token: 1, status: 1, _id: 1, project_id: 1, role_ids: 1 }
 			});
 			if(!user) throw Error.create(Error.NOT_FOUND, `Could not found username ${item.username}`);
 			exports.validate({userClient: item, userServer: user}, exports.VALIDATE.LOGIN);			
+			delete user.password;
+			delete user.api;
 			const projectService = require('./project.service');
 			cached = cachedService.open();
 			const project = await projectService.getCached(user.project_id, cached);			
@@ -204,6 +206,12 @@ exports = module.exports = {
 	async get(_id, dbo) {
 		_id = exports.validate(_id, exports.VALIDATE.GET);
 
+		dbo = await db.open(exports.COLLECTION, dbo);
+		const rs = await dbo.get(_id, dbo.isnew ? db.DONE : db.FAIL);
+		return rs;
+	},
+
+	async getMe(_id, dbo) {
 		dbo = await db.open(exports.COLLECTION, dbo);
 		const rs = await dbo.get(_id, dbo.isnew ? db.DONE : db.FAIL);
 		return rs;
