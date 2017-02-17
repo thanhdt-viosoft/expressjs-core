@@ -101,10 +101,10 @@ app.put('/me', bodyHandler.jsonHandler({
 	try {
 		req.body._id = {
             _id: req.auth.accountId,
-            project_id: req.auth.project_id
+            project_id: req.auth.projectId
         };
 		const accountService = require('../service/account.service');
-		const rs = await accountService.update(body);
+		const rs = await accountService.update(req.body);
 		res.send(rs);
 	} catch (err) {
 		next(err);
