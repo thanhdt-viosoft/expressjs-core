@@ -6,17 +6,22 @@ const fs = require('fs');
 const cors = require('cors');
 
 const app = express();
+global.app = app;
 
 app.disable('etag');
 app.disable('x-powered-by');
+
+if(app.get('env') === 'production') {
+    require('./env/production');
+} else {
+    require('./env/development');    
+}
 
 app.use(cors());
 
 global.FileUpload = (config) => {
     return config;
 }
-
-global.app = app;
 
 const files = fs.readdirSync(path.join(__dirname, 'src', 'controller'));
 files.map((f) => {
