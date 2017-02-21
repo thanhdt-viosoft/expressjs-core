@@ -157,9 +157,12 @@ exports = module.exports = {
 			const microService = require('../service/micro.service');
 			await microService.sendMail({
 				title: `You are assigned in project ${item.name}`,
-				content: `This is your account information which allow you login and use some our service\nUsername: ${username}\nPassword: ${randomPass}`,
+				content: `This is your account information which allow you <a href="${global.appconfig.auth.url}/dist/index.htm#!?id=${rs._id}">login</a> and use some our service
+<br/>Username: ${username}
+<br/>Password: ${randomPass}
+<br/>`,
 				config_name: 'admin',
-				html: false,
+				html: true,
 				to: [email]
 			}, auth);
 			cached = cachedService.open();
@@ -182,11 +185,22 @@ exports = module.exports = {
 
 	async delete(_id, dbo) {
 		_id = exports.validate(_id, exports.VALIDATE.DELETE);
-
+		
+		let cached;
 		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.delete(_id, dbo.isnew ? db.DONE : db.FAIL);
-
-		return rs;
+		try {
+			const rs = await dbo.delete(_id, dbo.isnew ? db.DONE : db.FAIL);
+			const roleService = require('./role.service');
+			const accountService = require('./account.service');
+			await roleService.deleteAll(_id, dbo);
+			await accountService.deleteAll(_id, dbo);
+			cached = cachedService.open();
+			exports.refeshCached(_id, null, cached, dbo);
+			return rs;
+		} finally{
+			if(cached) await cached.close();
+			if(dbo.isnew) await dbo.close();
+		}
 	}
 
 }

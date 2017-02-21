@@ -160,6 +160,26 @@ exports = module.exports = {
 		return rs;
 	},
 
+	async deleteAll(projectId, dbo) {
+		let cached;
+		dbo = await db.open(exports.COLLECTION, dbo);		
+		try {
+			const rs = await dbo.delete({
+				project_id: projectId
+			});
+
+			cached = cachedService.open();
+			await exports.refeshCached(projectId, cached, dbo, true);
+			
+			return rs;
+		} finally {
+			if(cached) await cached.close();
+			if(dbo.isnew) await dbo.close();
+		}		
+
+		return rs;
+	},
+
 	async delete(_id, dbo) {
 		_id = exports.validate(_id, exports.VALIDATE.DELETE);
 
@@ -170,7 +190,7 @@ exports = module.exports = {
 			const rs = await dbo.delete(_id);
 
 			cached = cachedService.open();
-			await exports.refeshCached(item.project_id, cached, dbo);
+			await exports.refeshCached(item.project_id, cached, dbo, true);
 			
 			return rs;
 		} finally {
