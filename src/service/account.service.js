@@ -245,24 +245,61 @@ exports = module.exports = {
 		dbo = await db.open(exports.COLLECTION, dbo);
 		try {
 			let oldItem;
-			if(item.secret_key) {
+			if(item.secret_key || item.role_ids) {
 				oldItem = await dbo.get(item._id);
+				if(_.isEqual(item.role_ids.sort(), oldItem.role_ids.sort())) {
+					delete oldItem;
+				}
 			}
 			const rs = await dbo.update(item);
 			if(oldItem) {
 				cached = cachedService.open();
-				await cached.del(`login.${oldItem.secret_key}`);
+				if(item.secret_key) await cached.del(`login.${oldItem.secret_key}`);					
+							
 				const user = await dbo.get({
-					_id: oldItem._id,
-					fields: { token: 1, status: 1, _id: 1, project_id: 1, role_ids: 1 }
+					$where: { _id: oldItem._id },
+					$fields: { token: 1, status: 1, _id: 1, project_id: 1, role_ids: 1 }
 				});
-				await cached.set(`login.${user.secret_key}`, user);
+				const secretKey = await cached.get(`login.${user.secret_key}`);					
+				const token = await cached.get(`login.${user.token}`);
+				if(secretKey) await cached.set(`login.${user.secret_key}`, user);
+				if(token) await cached.set(`login.${user.token}`, user);
 			}
 			return rs;
 		} finally {
 			if(cached) await cached.close();
 			if(dbo.isnew) await dbo.close();
 		}
+	},
+
+	async deleteAll(projectId, dbo) {
+		let cached;
+		dbo = await db.open(exports.COLLECTION, dbo);		
+		try {
+			const oldUsers = await dbo.find({
+				$where: {
+					project_id: projectId
+				},
+				$fields: {
+					secret_key: 1, 
+					token: 1
+				}
+			});
+			const rs = await dbo.delete({
+				project_id: projectId
+			});
+			cached = cachedService.open();
+			for(let oldUser of oldUsers) {
+				await cached.del(`login.${oldUser.secret_key}`);
+				await cached.del(`login.${oldUser.token}`);
+			}
+			return rs;
+		} finally {
+			if(cached) await cached.close();
+			if(dbo.isnew) await dbo.close();
+		}		
+
+		return rs;
 	},
 
 	async delete(_id, dbo) {
