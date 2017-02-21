@@ -65,7 +65,6 @@ app.post('/mail', bodyHandler.jsonHandler({
 	title: String,
 	content: String,
 	html: Boolean,
-	from: Object,
 	to: Array,
 	cc: Array,
 	bcc: Array,

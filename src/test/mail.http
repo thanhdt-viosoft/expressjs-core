@@ -105,21 +105,12 @@
 		'content-type': 'application/json'
 	},
 	requestBody: {
-		plugins: {
-			oauthv2: {
-				single_mode: false,
-				session_expired: 60
-			},
-			mail: {
-				trying_time: 3,
-				accounts: {
-					'admin': {
-						user: 'clipvnet@gmail.com',
-						pass: 'buithuha90',
-						name: 'echo test'
-					}
-				}
-			}
-		}
+		plugins: { oauthv2: { single_mode: false, session_expired: 60 }, mail: { trying_time: 3, accounts: { 'admin': { auth: { user: 'clipvnet@gmail.com', pass: 'YnVpdGh1aGE5MA==' }, service: 'gmail' , name: 'Super admin' } } } }
 	}
 }
+"plugins" : { "oauthv2" : { "single_mode" : true, "session_expired" : 1800 }, mail: { trying_time: 3, accounts: { 'admin': { user: 'clipvnet@gmail.com', pass: 'YnVpdGh1aGE5MA==', name: 'Super admin' } } } }
+
+
+db.project.update({"_id" : ObjectId("58a6db5263e9bd2b3c584066")}, {$set: {"plugins" : { "oauthv2" : { "single_mode" : true, "session_expired" : 1800 }, mail: { trying_time: 3, accounts: { 'admin': { user: 'clipvnet@gmail.com', pass: 'YnVpdGh1aGE5MA==', name: 'Super admin' } } } }}})
+
+db.project.update({"_id" : ObjectId("58a6db5263e9bd2b3c584066")}, {$set: {plugins: { oauthv2: { single_mode: false, session_expired: 60 }, mail: { trying_time: 3, accounts: { 'admin': { auth: { user: 'clipvnet@gmail.com', pass: 'YnVpdGh1aGE5MA==' }, service: 'gmail' , name: 'Super admin' } } } }}})

@@ -8,6 +8,6 @@ global.appconfig = {
         url: 'http://localhost:9600'
     },
     app: {
-        timeout_scan_email: 60000
+        timeout_scan_email: 5000
     }
 };

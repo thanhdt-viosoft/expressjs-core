@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer');
 const db = require('../db');
 const utils = require('../utils');
 const checker = require('../checker');
+const encrypt = require('../../lib/core/encrypt');
 const microService = require('./micro.service');
 
 /************************************
@@ -32,14 +33,14 @@ exports = module.exports = {
 				item._id = db.uuid();
 				checker.must('project_id', item.project_id, db.Uuid);
 				checker.must('title', item.title, String);
-				checker.must('content', item.content, String);
-				checker.must('html', item.html, Boolean);
+				checker.option('content', item.content, String);
+				item.html = checker.must('html', item.html, Boolean, false);
 				checker.must('from', item.from, Object);
 				checker.must('name', item.from.name, String);
 				checker.must('email', item.from.email, String);
 				checker.must('to', item.to, Array);
-				checker.must('cc', item.cc, Array);
-				checker.must('bcc', item.bcc, Array);
+				checker.option('cc', item.cc, Array);
+				checker.option('bcc', item.bcc, Array);
 				checker.must('mail_config', item.mail_config, Object);
 				checker.option('attachments', item.attachments, Array, (attachments) => {
 					const fs = require('fs');
@@ -99,9 +100,14 @@ exports = module.exports = {
 							await exports.send(e);
 							e.status = exports.STATUS.DONE;
 						}catch(err) {
-							e.trying_time--;
-							if(e.trying_time === 0) e.status = exports.STATUS.FAILED;
-							e.msg = err.toString();
+							if(err.status === Error.LOCKED){
+								e.status = exports.STATUS.FAILED;
+								e.msg = 'Some thing error in mail before send';	
+							} else {
+								e.trying_time--;
+								if(e.trying_time === 0) e.status = exports.STATUS.FAILED;
+								e.msg = err.toString();
+							}
 						}					
 					}
 					await dbo.update(e);
@@ -117,36 +123,42 @@ exports = module.exports = {
 	},
 	
 	async send(email){		
-		return new Promise((resolve, reject) => {			
-			email.mail_config.auth.pass = new Buffer(email.mail_config.auth.pass, 'base64').toString('utf8');
-			const transporter = nodemailer.createTransport(email.mail_config);
-			const mailOptions = {
-				from: `"${email.from.name}" <${email.from.email}>`,
-				to: email.to.join(', '),
-				subject: email.title
-			};
-			if(email.attachments) {
-				const path = require('path');
-				mailOptions.attachments = [];
-				for(let a of email.attachments){
-					mailOptions.attachments.push({
-						filename: a.name,
-						path: path.join(__dirname, '..', '..', 'assets', a.path)
-					});
+		return new Promise((resolve, reject) => {
+			try {			
+				const mailOptionConfig = _.cloneDeep(email.mail_config);
+				mailOptionConfig.auth.pass = encrypt.base64(mailOptionConfig.auth.pass, true);
+				delete mailOptionConfig.name;
+				const transporter = nodemailer.createTransport(mailOptionConfig);
+				const mailOptions = {
+					from: `"${email.from.name}" <${email.from.email}>`,
+					to: email.to.join(', '),
+					subject: email.title
+				};
+				if(email.attachments) {
+					const path = require('path');
+					mailOptions.attachments = [];
+					for(let a of email.attachments){
+						mailOptions.attachments.push({
+							filename: a.name,
+							path: path.join(__dirname, '..', '..', 'assets', a.path)
+						});
+					}
 				}
-			}
-			if(email.cc) mailOptions.cc = email.cc.join(', ');
-			if(email.bcc) mailOptions.bcc = email.bcc.join(', ');
-			if(email.html) mailOptions.html = email.content;
-			else mailOptions.text = email.content;
-			try {
-				transporter.sendMail(mailOptions, (error, info) => {
-					if (error) return reject(error);
-					resolve(info);
-				});
-			}catch(e){
-				reject(e);
-			}			
+				if(email.cc) mailOptions.cc = email.cc.join(', ');
+				if(email.bcc) mailOptions.bcc = email.bcc.join(', ');
+				if(email.html) mailOptions.html = email.content;
+				else mailOptions.text = email.content;
+				try {
+					transporter.sendMail(mailOptions, (error, info) => {
+						if (error) return reject(error);
+						resolve(info);
+					});
+				}catch(e){
+					reject(Error.create(Error.INTERNAL));
+				}	
+			}catch(e){				
+				reject(Error.create(Error.LOCKED));
+			}	
 		});		
 	},
 
@@ -165,11 +177,15 @@ exports = module.exports = {
 		const rs = await dbo.get(_id, dbo.isnew ? db.DONE : db.FAIL);
 		return rs;
 	},
-
+	
 	async insert(item, config_name, auth, dbo) {		
 		const projectConfig = await microService.getConfig(auth, 'mail');			
 		item.trying_time = projectConfig.trying_time;
 		item.mail_config = projectConfig.accounts[config_name];
+		item.from = {
+			name: item.mail_config.name,
+			email: item.mail_config.auth.user
+		};
 
 		item = exports.validate(item, exports.VALIDATE.INSERT);
 
