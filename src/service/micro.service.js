@@ -25,6 +25,18 @@ exports = module.exports = {
             }
         });
         if (resp.code === 200) return resp.body;
-        throw resp.body;
+        throw Error.create(resp.code, resp.body || resp.error);  
+    },
+    async sendMail(data, auth){
+        const resp = await httpService.post(`${global.appconfig.mail.url}/mail`, {
+            data,
+            headers: {
+                token: auth.rawToken,
+                path: 'plugin.mail>mail',
+                actions: 'ADD'
+            }
+        });
+        if (resp.code === 200) return resp.body;
+        throw Error.create(resp.code, resp.body || resp.error);        
     }
 }

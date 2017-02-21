@@ -56,12 +56,14 @@ app.get('/project-config', utils.auth(`${global.appconfig.name}>project`, 'GET_C
 
 app.post('/project', utils.auth(`${global.appconfig.name}>project`, 'ADD'), bodyHandler.jsonHandler({
 	name: String,
+	des: String,
+	email: String,
 	status: Number,
 	plugins: Object
 }), async(req, res, next) => {
 	try {
 		if(projectService.ROOT_PROJECT_ID.toString() !== req.auth.projectId.toString()) throw Error.create(Error.AUTHORIZ);
-		const rs = await projectService.insert(req.body);
+		const rs = await projectService.insert(req.body, req.auth);
 		res.send(rs);
 	} catch (err) {
 		next(err);
@@ -70,6 +72,7 @@ app.post('/project', utils.auth(`${global.appconfig.name}>project`, 'ADD'), body
 
 app.put('/project', bodyHandler.jsonHandler({
     name: String,
+	des: String,
     plugins: Object
 }), utils.auth(`${global.appconfig.name}>project`, 'UPDATE'), async(req, res, next) => {
 	try {

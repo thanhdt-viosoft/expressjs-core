@@ -27,16 +27,14 @@ exports = module.exports = {
 			case exports.VALIDATE.INSERT:
 				item._id = db.uuid();
 				checker.must('name', item.name, String);
+				checker.option('des', item.name, String);
 				item.status = checker.must('status', item.status, Number, 0);
-				checker.option('plugins', item.plugins, Object, (plugins) => {
-					checker.option('oauthv2', item.plugins.oauthv2, Object, (oauthv2) => {
-						checker.must('single_mode', item.plugins.oauthv2.single_mode, Boolean);
-						checker.must('session_expired', item.plugins.oauthv2.session_expired, Number);	
-					});					
-					checker.option('mail', item.plugins.mail, Object);
-				}, () => {
-					item.plugins = {};
-				});				
+				item.plugins = {
+					oauthv2: {
+						single_mode: true,
+						session_expired: 300
+					}
+				};
 				item.created_at = new Date();
 				item.updated_at = new Date();
 
@@ -44,6 +42,7 @@ exports = module.exports = {
 			case exports.VALIDATE.UPDATE:
 				checker.must('_id', item._id, db.Uuid);
 				checker.option('name', item.name, String);
+				checker.option('des', item.name, String);
 				checker.option('status', item.status, Number);
 				checker.option('plugins', item.plugins, Object, (plugins) => {
 					checker.option('oauthv2', item.plugins.oauthv2, Object, (oauthv2) => {
@@ -113,9 +112,12 @@ exports = module.exports = {
 		return rs;
 	},
 
-	async insert(item, dbo) {
+	async insert(item, auth, dbo) {
+		const email = _.clone(item.email);
+		delete item.email;
 		item = exports.validate(item, exports.VALIDATE.INSERT);
 
+		let cached;
 		dbo = await db.open(exports.COLLECTION, dbo);
 		try {
 			const rs = await dbo.insert(item);
@@ -140,17 +142,31 @@ exports = module.exports = {
 					actions: ['.*']
 				}]
 			}, dbo);	
+			const randomPass = utils.uuid().toString().substr(0, 6);
+			const username = 'admin';
 			const account = accountService.insert({
 				project_id: rs._id,
-				username: 'admin',
-				password: eycrypt.md5('admin!@#$%'),
+				username: username,
+				password: eycrypt.md5(randomPass),
 				status: 1,
-				recover_by: 'admin@email.com',
+				recover_by: email,
+				is_nature: true,
 				role_ids: [role._id],
 				more: {}
 			}, dbo);
+			const microService = require('../service/micro.service');
+			await microService.sendMail({
+				title: `You are assigned in project ${item.name}`,
+				content: `This is your account information which allow you login and use some our service\nUsername: ${username}\nPassword: ${randomPass}`,
+				config_name: 'admin',
+				html: false,
+				to: [email]
+			}, auth);
+			cached = cachedService.open();
+			await exports.refeshCached(rs._id, rs, cached, dbo);
 			return rs;
 		} finally{
+			if(cached) await cached.close();
 			if(dbo.isnew) await dbo.close();
 		}
 	},
