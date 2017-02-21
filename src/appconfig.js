@@ -7,8 +7,11 @@ global.appconfig = {
     auth: {
         url: 'http://localhost:9600'
     },
+    mail: {
+        url: 'http://localhost:9602'
+    },
     app: {
-        rootProjectId: '58a714841ca4c40a38ae2125'
+        rootProjectId: '58a6db5263e9bd2b3c584066'
     },
     cache: {
         redis: {
