@@ -41,7 +41,6 @@ app.get('/account/:_id', utils.auth(`${global.appconfig.name}>account`, 'GET'), 
 });
 
 app.post('/account', utils.auth(`${global.appconfig.name}>account`, 'ADD'), bodyHandler.jsonHandler({
-	project_id: db.uuid,
 	role_ids: (role_ids) => {
 		return role_ids.map(db.uuid);
 	},
@@ -53,6 +52,7 @@ app.post('/account', utils.auth(`${global.appconfig.name}>account`, 'ADD'), body
 	more: Object
 }), async(req, res, next) => {
 	try {
+		req.body.project_id = req.auth.projectId;
 		const rs = await accountService.insert(req.body);
 		res.send(rs);
 	} catch (err) {

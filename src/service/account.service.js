@@ -162,7 +162,11 @@ exports = module.exports = {
 			if(!user) throw Error.create(Error.EXPIRED, 'Session was expired');
 			const roleService = require('./role.service');auth.projectId.toString()
 			const roles = await roleService.getCached(auth.projectId, cached) || [];
-			for(let role of roles){
+			for(let role of roles.filter((e) => {
+				return user.role_ids.map((id) => {
+					return id.toString();
+				}).indexOf(e._id.toString()) !== -1;
+			})){
 				for(let r of role.api) {
 					if(new RegExp(`^${r.path}$`, 'gi').test(auth.path) && _.some(auth.actions, (a) => {
 						for(var auAction of r.actions){

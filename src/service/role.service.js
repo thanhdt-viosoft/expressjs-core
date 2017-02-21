@@ -149,7 +149,7 @@ exports = module.exports = {
 			const rs = await dbo.update(item);
 
 			cached = cachedService.open();
-			await exports.refeshCached(item.project_id, cached, dbo);
+			await exports.refeshCached(item._id.project_id, cached, dbo);
 			
 			return rs;
 		} finally {
