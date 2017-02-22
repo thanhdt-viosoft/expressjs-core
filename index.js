@@ -15,6 +15,8 @@ app.use(cors({
     exposedHeaders: ['token']
 }));
 
+app.use('/dist', express.static('web/dist'));
+
 if(app.get('env') === 'production') {
     require('./env/production');
 } else {
