@@ -11,13 +11,24 @@ const mailService = require('../service/mail.service');
  ** CREATED DATE: 2/16/2017, 4:42:00 PM
  *************************************/
 
+app.post('/config', utils.auth(`${global.appconfig.name}>mail`, 'CONFIG'), async(req, res, next) => {
+	try {
+		const rs = await mailService.config(req.auth);
+		res.send(rs);		
+	} catch (err) {
+		next(err);
+	}
+});
+
 app.get('/mail', utils.auth(`${global.appconfig.name}>mail`, 'FIND'), async(req, res, next) => {
 	try {
 		let where = req.query.q ? JSON.parse(req.query.q) : {};
 		where.project_id = req.auth.projectId;
+		if(!_.isNil(req.query.status) && req.query.status.length > 0) where.status = +req.query.status;
 		const rs = await mailService.find({
 			$where: where,
 			$sort: {
+				status: 1,
 				updated_at: 1
 			}
 		});

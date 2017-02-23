@@ -8,6 +8,9 @@ const cors = require('cors');
 const app = express();
 global.app = app;
 
+app.use('/dist', express.static('web/dist'));
+app.use('/attachments', express.static('assets/attachments'));
+
 app.disable('etag');
 app.disable('x-powered-by');
 
