@@ -54,6 +54,15 @@ app.get('/project-config', utils.auth(`${global.appconfig.name}>project`, 'GET_C
 	}
 });
 
+app.put('/project-config', utils.auth(`${global.appconfig.name}>project`, 'UPDATE_CONFIG'), bodyHandler.jsonHandler(), async(req, res, next) => {
+	try {
+		const rs = await projectService.initConfig(req.auth.projectId, req.body);
+		res.send(req.body);
+	} catch (err) {
+		next(err);
+	}
+});
+
 app.post('/project', utils.auth(`${global.appconfig.name}>project`, 'ADD'), bodyHandler.jsonHandler({
 	name: String,
 	des: String,

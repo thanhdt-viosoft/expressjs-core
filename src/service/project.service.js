@@ -20,6 +20,7 @@ exports = module.exports = {
 		GET: 2,
 		DELETE: 3,
 		FIND: 4,
+		UPDATE_CONFIG: 5,
 	},
 	ROOT_PROJECT_ID: db.uuid(global.appconfig.app.rootProjectId),
 	validate(item, action) {
@@ -82,6 +83,28 @@ exports = module.exports = {
 			return rs;
 		} finally {
 			await cached.close();
+		}
+	},
+	
+	async initConfig(_id, config, dbo) {
+		config = exports.validate(config, exports.VALIDATE.UPDATE_CONFIG);
+
+		dbo = await db.open(exports.COLLECTION, dbo);
+		try {
+			const oldItem = await dbo.get({
+				$where: {
+					_id: _id
+				},
+				$fields: {
+					_id: 1,
+					plugins: 1
+				}
+			});
+			oldItem.plugins = _.merge({}, config, oldItem.plugins);
+			const rs = await dbo.update(oldItem);
+			return rs;
+		} finally {
+			if(dbo.isnew) await dbo.close();
 		}
 	},
 
