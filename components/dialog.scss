@@ -1,0 +1,22 @@
+dialog {
+    border: solid 1px $dark-2;
+    padding: 16px;
+    box-shadow: 0px 2px 3px $dark-2;
+    border-top: 5px solid $primary;
+
+    h1 {
+        padding: 0px;
+        margin: 0px 0px 24px;
+    }
+
+    h3 {
+        padding: 0px;
+        margin: 0px 0px 8px;
+    }
+
+    .close {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+    }
+}

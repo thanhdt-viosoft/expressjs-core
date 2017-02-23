@@ -1,0 +1,36 @@
+.table {
+    width: 100%;
+    white-space: nowrap;
+    font-size: $fontM;
+    border-collapse: collapse;
+    box-shadow: 0px 1px 1px $dark-2;
+
+    .number {
+        text-align: right;
+    }
+
+    .date {
+        text-align: center;
+    }
+    
+    thead tr {
+        color: $dark-1;
+        border: solid 1px $dark-2;
+        th {
+            padding: 12px 8px 8px;
+        }
+    }
+    tbody tr {
+        border: solid 1px $dark-2;
+        transition-duration: .28s;
+        transition-timing-function: cubic-bezier(.4,0,.2,1);
+        transition-property: background-color;
+        th, td {
+            color: $gray;
+            padding: 8px;            
+        }
+    }
+    tbody tr:hover {
+        background-color: $light1;
+    }
+}

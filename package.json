@@ -1,35 +1,23 @@
 {
-  "name": "mcro-core",
+  "name": "expressjs-core-merge",
   "version": "1.0.0",
-  "description": "It extends expressjs-core. It help us easy to make core micro service and generate APIs",
+  "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node --harmony-async-await index.js",
-    "test": "node --harmony-async-await test.js",
-    "check": "nsp check",
-    "gen": "node ./lib/generate/gen.js",
-    "pm2": "pm2 start pm2.config.js",
-    "dev": "cd ./web && npm run dev",
-    "route": "node ./web/webpack.import",
-    "create": "node ./web/tools-create"
+    "start": "node index",
+    "dev": "sass --watch ./"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/just4developments/expressjs-core/tree/mcro-core"
+    "url": "git+https://github.com/thanhdt-viosoft/expressjs-core.git"
   },
-  "author": "just4developments@gmail.com",
+  "author": "",
   "license": "ISC",
-  "dependencies": {
-    "body-parser": "^1.16.1",
-    "cors": "^2.8.1",
-    "express": "^5.0.0-alpha.3",
-    "helmet": "^3.4.0",
-    "lodash": "^4.17.2",
-    "mongodb": "^2.2.22",
-    "unirest": "^0.5.1",
-    "uuid": "^3.0.1"
+  "bugs": {
+    "url": "https://github.com/thanhdt-viosoft/expressjs-core/issues"
   },
-  "devDependencies": {
-    "js-beautify": "^1.6.4"
+  "homepage": "https://github.com/thanhdt-viosoft/expressjs-core#readme",
+  "dependencies": {
+    "express": "^4.14.1"
   }
 }
