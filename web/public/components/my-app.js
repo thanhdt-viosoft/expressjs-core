@@ -3,9 +3,9 @@ module.exports = {
     name: 'myApp',
     template: require('./my-app.html'),
     $routeConfig: [{
-        path: '/product-list',
-        name: 'ProductList',
-        component: 'test',
+        path: '/',
+        name: 'MailList',
+        component: 'mailList',
         useAsDefault: true
     }]
 }

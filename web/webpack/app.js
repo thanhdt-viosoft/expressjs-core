@@ -11,6 +11,7 @@ require(['angular', 'router'], (angular) => {
 			'../public/components/app-filter.js',
 			'../public/components/app-provider.js',
 			'../public/components/my-app.js',
+			'../public/components/mail/list.js',
 			'../public/components/product/product-list.js',
 			'../public/components/product/test.js'], (...com) => {
         for (var i in com) {

@@ -1,0 +1,49 @@
+<dialog id="formDetails">    
+    <a href="javascript:void(0)" close-modal="#formDetails" class="close">[X]</a>
+    <h1>Mail information</h1>
+    <div>
+        <h3>{{$ctrl.mail.title}}</h3>
+        <p ng-if="$ctrl.mail.html" ng-bind-html-unsafe="$ctrl.mail.content"></p>
+        <p ng-if="!$ctrl.mail.html"><pre>{{$ctrl.mail.content}}</pre></p>
+        <div ng-if="$ctrl.mail.to">To: [ <a href="mailto:{{to}}" ng-repeat="to in $ctrl.mail.to">{{to}}</a> ]</div>
+        <div ng-if="$ctrl.mail.cc">CC: [ <a href="mailto:{{cc}}" ng-repeat="cc in $ctrl.mail.cc">{{cc}}</a> ]</div>
+        <div ng-if="$ctrl.mail.bcc">BCC: [ <a href="mailto:{{bcc}}" ng-repeat="bcc in $ctrl.mail.bcc">{{bcc}}</a> ]</div>
+        <p>
+            Attachments: <a href="{{$ctrl.apiUrl}}{{att.path}}" ng-repeat="att in $ctrl.mail.attachments">{{att.name}}</a>
+        </p>
+        <p>Sender: <b>{{$ctrl.mail.config_name}}</b></p>
+    </div>
+</dialog>
+<table class="table" width="100%">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Title</th>        
+            <th>
+                <select ng-model="$ctrl.filterStatus" ng-change="$ctrl.loadData()">
+                    <option value="">Status (All)</option>
+                    <option value="0" class="warn">Pending</option>
+                    <option value="1" class="error">Error</option>
+                    <option value="2" class="error">Failed</option>
+                    <option value="3" class="pass">Done</option>
+                </select>
+            </th>
+            <th>Sender</th>
+            <th>Created date</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="item in $ctrl.mails">
+        <th>{{$index+1}}. </th>
+        <td>{{item.title}}</td>
+        <td title="{{item.msg}}" ng-class="{warn: item.status == 0, error: (item.status == 1 || item.status == 2), pass: item.status === 3}">{{item.status | status}}{{item.status === 1 ? (' (' + item.trying + ')') : ''}}</td>        
+        <td>{{item.config_name}}</td>
+        <td class="date">{{item.updated_at | date:'yyyy-MM-dd HH:mm'}}</td>
+        <th>
+            <a href="javascript: void(0);" open-modal="#formDetails" ng-click="$ctrl.details(item)">Details</a>
+            <a href="javascript: void(0);" ng-click="$ctrl.delete(item)">Delete</a>
+        </th>
+    </tr>
+    </tbody>
+</table>

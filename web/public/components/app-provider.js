@@ -1,38 +1,15 @@
 module.exports = {    
-    Cuisine: ['$http', '$rootScope', '$config', '$q', function ($http, $rootScope, $config, $q) {
+    Mail: ['$http', '$rootScope', '$config', function ($http, $rootScope, $config) {
         return {
-            findById: (id) => {
-                var cuisine = null;
-                $rootScope.cuisines.forEach(item => {
-                    if (item.id == id)
-                        cuisine = item;
-                });
-                return cuisine;
+            find(status) {
+                return $http.get(`${$config.apiUrl}/mail?status=${status}`);
             },
-            search: (name) => {
-                var deferred = $q.defer();
-                var rs = [];
-                name = name.toLowerCase();
-                for (var item of $rootScope.cuisines) {
-                    if (item.name.toLowerCase().indexOf(name) != -1 || item.des.toLowerCase().indexOf(name) != -1)
-                        rs.push(item);
-                }
-                setTimeout(() => {
-                    deferred.resolve({
-                        data: rs
-                    });
-                }, 500);
-                return deferred.promise;
+            init() {
+                return $http.post(`${$config.apiUrl}/config`);
             },
-            find: () => {
-                // Used in new version
-                return $http.get(`${$config.apiUrl}/whatseat/cuisine`);
-            },
-            load: () => {
-                $http.get(`${$config.apiUrl}/whatseat/cuisine`).then((res) => {
-                    $rootScope.cuisines = res.data;
-                });
-            }
+            delete(_id) {                
+                return $http.delete(`${$config.apiUrl}/mail/${_id}`);
+            }   
         };
     }]
 }
