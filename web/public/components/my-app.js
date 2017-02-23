@@ -5,7 +5,7 @@ module.exports = {
     $routeConfig: [
         { path: '/:id',name: 'Login',component: 'login',useAsDefault: true},
         { path: '/projects',name: 'Projects',component: 'projects'},
-        { path: '/index',name: 'Index',component: 'index'},
+        { path: '/config',name: 'Config',component: 'config'},
         { path: '/role',name: 'Role',component: 'role'},
         { path: '/empty',name: 'Empty',component: 'empty' },
         { path: '/account',name: 'Account',component: 'account'}

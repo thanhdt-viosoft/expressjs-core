@@ -14,7 +14,7 @@ module.exports = {
             self.err= {};
               
             if(!$location.search().id) {
-                console.log("Lack of PJID");
+                console.log("Lack of id");
                 return;
             }
             if(!self.user.username) {
@@ -27,13 +27,9 @@ module.exports = {
             } 
 
             let projectId;
-            //Root PJID : 58a6db5263e9bd2b3c584066
-            // Validium PJID : 58abe92aee82392c800270c9
             if(!$window.sessionStorage.projectId) projectId = $location.search().id;
             Account.login(self.user, projectId).then((res) => {
-                $window.localStorage.token = res.headers('token');
                 $http.defaults.headers.common.token = res.headers('token');
-                $location.path('/projects');
             });
             
         }

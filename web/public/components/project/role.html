@@ -12,7 +12,7 @@
   </div>
   <p></p>
   <details ng-repeat="item in $ctrl._roles | filter : $ctrl._kword">
-    <summary>{{item.name}}
+    <summary>{{item.name}} <b>{{item._id}}</b>
       <button class="_btn-save" ng-click="$ctrl.deleteRole($index,item._id)">Delete</button>
     </summary>
     

@@ -16,7 +16,7 @@ require(['angular', 'router',
 			'../public/components/product/product-list.js',
 			'../public/components/product/test.js',
 			'../public/components/project/account.js',
-			'../public/components/project/index.js',
+			'../public/components/project/config.js',
 			'../public/components/project/login.js',
 			'../public/components/project/projects.js',
 			'../public/components/project/role.js'], (...com) => {
