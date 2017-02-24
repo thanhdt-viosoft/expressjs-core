@@ -27,6 +27,16 @@ app.post('/login', bodyHandler.jsonHandler({
 	}
 });
 
+app.post('/logout', utils.authHandler(true), async(req, res, next) => {
+	try {
+		const accountService = require('../service/account.service');
+		await accountService.logout(req.auth.secretToken);
+		res.end();
+	} catch (err) {
+		next(err);
+	}
+});
+
 app.head('/authoriz', utils.authHandler(), async(req, res, next) => {
 	try {
 		if(req.headers.path) req.auth.path = req.headers.path;

@@ -154,6 +154,10 @@ exports = module.exports = {
 		}
 	},
 
+	async logout(token){
+		await cachedService.open(true).del(`login.${token}`);
+	},
+
 	async authoriz(auth) {
 		auth = exports.validate(auth, exports.VALIDATE.AUTHORIZ);
 		const cached = cachedService.open();
