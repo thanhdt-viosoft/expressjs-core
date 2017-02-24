@@ -13,10 +13,11 @@ exports = module.exports = _.extend(require('../lib/core/utils'), {
         return async (req, res, next) => {
             if(!req.headers.token && !req.headers.secret_key) return next(Error.create(Error.AUTHEN));
             if(req.headers.token) {
-                const [project_id, account_id, token] = req.headers.token.split('-');        
+                const [projectId, accountId, token] = req.headers.token.split('-');  
+                if(!projectId || !accountId || !token) return next(Error.create(Error.AUTHEN));
                 req.auth = {
-                    projectId: db.uuid(project_id),
-                    accountId: db.uuid(account_id),
+                    projectId: db.uuid(projectId),
+                    accountId: db.uuid(accountId),
                     secretToken: db.uuid(token)
                 };
             }else {
