@@ -10,10 +10,6 @@ module.exports = {
         this.$routerOnActivate = (next) => {
             Role.get().then((res) => {
                 if(res.data.constructor === Array) self._roles = res.data;
-            }).catch((err) => {
-                setTimeout(function() {
-                    document.querySelector('#btnApply').click();    
-                });
             }); 
 
             Account.get().then((res) => {
@@ -91,10 +87,7 @@ module.exports = {
 
             self._account = (!item ? {}:item);
             document.getElementById('favDialog').showModal();
-        } 
-        this.sendRedirect = () => {
-            $location.path('/');
-        }
+        }        
         this.closeModal = () => {
 
             if(self._oldItem && self._oldItem.password !== self._account.password) {

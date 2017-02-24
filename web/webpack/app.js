@@ -12,12 +12,10 @@ require(['angular', 'router',
 			'../public/components/app-filter.js',
 			'../public/components/app-provider.js',
 			'../public/components/my-app.js',
-			'../public/components/error/empty.js',
-			'../public/components/product/product-list.js',
-			'../public/components/product/test.js',
 			'../public/components/project/account.js',
 			'../public/components/project/config.js',
 			'../public/components/project/login.js',
+			'../public/components/project/logout.js',
 			'../public/components/project/projects.js',
 			'../public/components/project/role.js'], (...com) => {
         for (var i in com) {

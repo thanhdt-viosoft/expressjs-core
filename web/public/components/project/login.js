@@ -1,7 +1,7 @@
 module.exports = {
     name: 'login',
     template: require('./login.html'),
-    controller: ['$config', 'Account', '$http', '$location', '$window', function ($config, Account, $http, $location, $window) {
+    controller: ['$config', 'Account', '$http', '$location', '$window', 'UtilsService', function ($config, Account, $http, $location, $window, UtilsService) {
         require('./login.scss');
         let self = this;
         self.user = {};
@@ -24,12 +24,11 @@ module.exports = {
             if(!self.user.password){
                 self.err.pwd = "*";
                 return;
-            } 
-
-            let projectId;
-            if(!$window.sessionStorage.projectId) projectId = $location.search().id;
+            }
+            let projectId = $location.search().id;
+            let theme = $location.search().theme;
             Account.login(self.user, projectId).then((res) => {
-                $http.defaults.headers.common.token = res.headers('token');
+                UtilsService.throwError({theme: theme, token: res.headers('token')});
             });
             
         }

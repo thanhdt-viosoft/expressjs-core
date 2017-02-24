@@ -33,25 +33,17 @@ module.exports = {
                     plugins: value
                 }).then((res) => {
                     // success
-                }).catch((err) => {
-                    console.log(err);
                 });
             }catch(e){
                 console.log('Config file is wrong format');
             }
-        };
-
-        this.sendRedirect = () => {
-            $location.path('/');
-        }
+        };        
 
         Project.get().then((res) => {
             self._project = res.data;
             for(var k in self._project.plugins) {
                 self._project.plugins[k] = JSON.stringify(self._project.plugins[k], null, '  ');
             }            
-        }).catch((err) => {
-            console.log(err);
         });
     }]
 }

@@ -1,14 +1,10 @@
-  <div class="login-card">
-    <h1>Log-in</h1><br>
-  <form>
+<div class="login-card">
+  <h1>Log-in</h1><br>
+  <form ng-submit="$ctrl.login()">
     <input type="text" placeholder="Username" ng-model="$ctrl.user.username">
-    <lable class="err" ng-show="$ctrl.err.usr">Username is required</lable>
-    <input type="password" name="pass" placeholder="Password" ng-model="$ctrl.user.password">
-    <lable class="err"  ng-show="$ctrl.err.pwd">Password is required</lable>
-    <input type="button" name="login" class="login login-submit" value="login" ng-click="$ctrl.login()">
+    <label class="err" ng-show="$ctrl.err.usr">Username is required</label>
+    <input type="password" placeholder="Password" ng-model="$ctrl.user.password">
+    <label class="err"  ng-show="$ctrl.err.pwd">Password is required</label>
+    <button type="submit" class="primary">login</button>
   </form>
-    
-  <!--<div class="login-help">
-    <a href="#">Register</a> • <a href="#">Forgot Password</a>
-  </div>-->
 </div>
