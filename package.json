@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index",
-    "dev": "sass --watch ./"
+    "dev": "webpack --progress --colors --watch",
+    "theme": "sass --watch ./theme.scss:./dist/theme.css --style compressed",
+    "package": "webpack --progress --colors & sass ./theme.scss:./dist/theme.css --style compressed"
   },
   "repository": {
     "type": "git",
@@ -18,6 +20,24 @@
   },
   "homepage": "https://github.com/thanhdt-viosoft/expressjs-core#readme",
   "dependencies": {
+    "compression": "^1.6.2",
     "express": "^4.14.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.14.0",
+    "css-loader": "^0.25.0",
+    "exports-loader": "^0.6.3",
+    "extract-loader": "0.0.2",
+    "file-loader": "^0.9.0",
+    "html-loader": "^0.4.4",
+    "imports-loader": "^0.6.5",
+    "node-sass": "^3.11.2",
+    "raw-loader": "^0.5.1",
+    "sass-loader": "^4.0.2",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.13.2"
   }
 }
