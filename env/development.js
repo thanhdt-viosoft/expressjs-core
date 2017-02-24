@@ -1,7 +1,6 @@
 const db = require('../src/db');
 
 console.log('This is development mode');
-app.all('/*', (req, res, next) => {
+setInterval(() => {
     console.log('-', `Mongo: ${db.size()}`);
-    next();
-});
+}, 5000);
