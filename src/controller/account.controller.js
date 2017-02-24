@@ -16,6 +16,9 @@ app.get('/account', utils.auth(`${global.appconfig.name}>account`, 'FIND'), asyn
 	try {
 		let where = req.query.q ? JSON.parse(req.query.q) : {};
 		where.project_id = req.auth.projectId;
+		where._id = {
+			$ne: req.auth.accountId
+		};
 		const rs = await accountService.find({
 			$where: where,
 			$sort: {
