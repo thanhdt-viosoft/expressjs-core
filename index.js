@@ -1,9 +1,11 @@
 const express = require('express');
+const compression = require('compression');
 const app = express();
-const port = 9599;
+const appconfig = require('./config.js');
 
+app.use(compression());
 app.use('/', express.static('dist'));
 
-app.listen(port, () => {
-  console.log('Theme is listening on %d', port);
+app.listen(appconfig.listen, () => {
+  console.log('Theme is listening on %d', appconfig.listen);
 });
