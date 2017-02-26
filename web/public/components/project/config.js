@@ -40,7 +40,7 @@ module.exports = {
         };        
 
         Project.get().then((res) => {
-            self._project = res.data;
+            self._project = res.data instanceof Array ? res.data[0] : res.data;
             for(var k in self._project.plugins) {
                 self._project.plugins[k] = JSON.stringify(self._project.plugins[k], null, '  ');
             }            

@@ -30,7 +30,7 @@
         <td>{{item.des}}</td>
         <td>{{item.created_at | date:'yyyy-MM-dd HH:mm'}}</td>
         <td style="text-align: right;">
-          <label class="_link" ng-click="$ctrl.showModal('delete', item)">Delete</label>
+          <label class="_link" ng-click="$ctrl.showModal('delete', item)" ng-if="$index !== 0">Delete</label>
         </td>
       </tr>
       </tbody>

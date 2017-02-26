@@ -10,7 +10,7 @@ module.exports = {
         this.$routerOnActivate = (next) => {
             Project.get().then((res)=> {
                 if(res.data instanceof Array) self._projects = res.data;
-                else UtilsService.throwError({currentProject: res.data});
+                UtilsService.throwError({currentProject: res.data});
             });
         } 
         this.create = () => {
