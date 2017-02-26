@@ -56,7 +56,7 @@ app.post('/account', utils.auth(`${global.appconfig.name}>account`, 'ADD'), body
 }), async(req, res, next) => {
 	try {
 		req.body.project_id = req.auth.projectId;
-		const rs = await accountService.insert(req.body);
+		const rs = await accountService.insert(req.body, req.auth);
 		res.send(rs);
 	} catch (err) {
 		next(err);

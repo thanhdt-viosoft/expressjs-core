@@ -84,8 +84,9 @@ exports = module.exports = {
 
 				break;
 			case exports.VALIDATE.GET:
-				checker.must('_id', item._id, db.Uuid);
-				checker.must('project_id', item.project_id, db.Uuid);
+				checker.option('_id', item._id, db.Uuid);
+				checker.option('project_id', item.project_id, db.Uuid);
+				checker.option('is_nature', item.is_nature, Boolean);
 
 				break;
 			case exports.VALIDATE.DELETE:
@@ -155,7 +156,9 @@ exports = module.exports = {
 	},
 
 	async logout(token){
-		await cachedService.open(true).del(`login.${token}`);
+		let cached = await cachedService.open();
+		cached.del(`login.${token}`);
+		await cached.close();
 	},
 
 	async authoriz(auth) {
@@ -225,7 +228,7 @@ exports = module.exports = {
 		return rs;
 	},
 
-	async insert(item, dbo) {
+	async insert(item, auth, dbo, cached) {
 		item = exports.validate(item, exports.VALIDATE.INSERT);
 
 		dbo = await db.open(exports.COLLECTION, dbo);
@@ -235,9 +238,48 @@ exports = module.exports = {
 				project_id: item.project_id
 			});
 			if(existedUser) throw Error.create(Error.BAD_REQUEST, `User ${item.username} was existed`);
+			cached = cachedService.open(cached);
+			const projectService = require('./project.service');	
+			const defaultAdmin = await dbo.get({is_nature: true});
+			if(!defaultAdmin) throw Error.create(Error.INTERNAL, 'Could not found default admin');
+			const project = await projectService.getCached(item.project_id, cached);			
+			if(item.is_nature) {
+				const microService = require('../service/micro.service');
+				await microService.sendMail({
+					title: `You are assigned in project ${project.name}`,
+					content: `This is your account information which allow you <a href="${global.appconfig.auth.url}/dist/index.htm#!?id=${item.project_id}">login</a> and use some our service
+	<br/>Username: ${item.username}
+	<br/>Password: ${item.password0}
+	<br/>`,
+					config_name: 'admin',
+					html: true,
+					to: [item.recover_by]
+				}, auth);
+			}else {
+				if(project.plugins.oauthv2.is_verify === true) {
+					item.status = 0;
+					const microService = require('../service/micro.service');
+					await microService.sendMail({
+						title: `You are assigned in project ${project.name}`,
+						content: `This is your account information which allow you <a href="${global.appconfig.auth.url}/dist/index.htm#!?id=${item.project_id}">login</a> and use some our service
+		<br/>Username: ${item.username}
+		<br/>Password: ${item.password0}
+		<br/>`,
+						config_name: 'admin',
+						html: true,
+						to: [item.recover_by]
+					}, {
+						secret_key: defaultAdmin.secret_key
+					});
+				} else {
+					item.status = 1;
+				}
+			}
+			delete item.password0;
 			const rs = await dbo.insert(item);
 			return rs;
 		} finally {
+			if(cached.isnew) await cached.close();
 			if(dbo.isnew) await dbo.close();
 		}		
 	},

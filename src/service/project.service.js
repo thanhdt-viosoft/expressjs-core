@@ -33,7 +33,8 @@ exports = module.exports = {
 				item.plugins = {
 					oauthv2: {
 						single_mode: true,
-						session_expired: 300
+						session_expired: 15*60,
+						is_verify: true
 					}
 				};
 				item.created_at = new Date();
@@ -47,8 +48,9 @@ exports = module.exports = {
 				checker.option('status', item.status, Number);
 				checker.option('plugins', item.plugins, Object, (plugins) => {
 					checker.option('oauthv2', item.plugins.oauthv2, Object, (oauthv2) => {
-						checker.must('single_mode', item.plugins.oauthv2.single_mode, Boolean);
+						checker.must('single_mode', item.plugins.oauthv2.single_mode, Boolean);						
 						checker.must('session_expired', item.plugins.oauthv2.session_expired, Number);	
+						checker.must('is_verify', item.plugins.oauthv2.single_mode, Boolean);
 					});					
 					checker.option('mail', item.plugins.mail, Object);
 				});				
@@ -149,6 +151,8 @@ exports = module.exports = {
 			const eycrypt = require('../../lib/core/encrypt');
 			const accountService = require('./account.service');
 
+			cached = cachedService.open();
+
 			const role = await roleService.insert({
 				project_id: rs._id,
 				name: 'Admin',
@@ -164,35 +168,26 @@ exports = module.exports = {
 					path: '.*',
 					actions: ['.*']
 				}]
-			}, dbo);	
+			}, dbo, cached);	
+			
+			await exports.refeshCached(rs._id, rs, cached, dbo);
+
 			const randomPass = utils.uuid().toString().substr(0, 6);
 			const username = 'admin';
-			const account = accountService.insert({
+			const account = await accountService.insert({
 				project_id: rs._id,
 				username: username,
+				password0: randomPass,
 				password: eycrypt.md5(randomPass),
 				status: 1,
 				recover_by: email,
 				is_nature: true,
 				role_ids: [role._id],
 				more: {}
-			}, dbo);
-			const microService = require('../service/micro.service');
-			await microService.sendMail({
-				title: `You are assigned in project ${item.name}`,
-				content: `This is your account information which allow you <a href="${global.appconfig.auth.url}/dist/index.htm#!?id=${rs._id}">login</a> and use some our service
-<br/>Username: ${username}
-<br/>Password: ${randomPass}
-<br/>`,
-				config_name: 'admin',
-				html: true,
-				to: [email]
-			}, auth);
-			cached = cachedService.open();
-			await exports.refeshCached(rs._id, rs, cached, dbo);
+			}, auth, dbo, cached);			
 			return rs;
 		} finally{
-			if(cached) await cached.close();
+			if(cached.isnew) await cached.close();
 			if(dbo.isnew) await dbo.close();
 		}
 	},
@@ -200,10 +195,19 @@ exports = module.exports = {
 	async update(item, dbo) {
 		item = exports.validate(item, exports.VALIDATE.UPDATE);
 
+		let cached;
 		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.update(item, dbo.isnew ? db.DONE : db.FAIL);
+		try {
+			const rs = await dbo.update(item);
+			const newItem = await dbo.get(item._id);
+			cached = cachedService.open();
+			await exports.refeshCached(newItem._id, newItem, cached, dbo);
 
-		return rs;
+			return rs;
+		}finally{
+			if(cached) await cached.close();
+			if(dbo.isnew) await dbo.close();
+		}
 	},
 
 	async delete(_id, dbo) {

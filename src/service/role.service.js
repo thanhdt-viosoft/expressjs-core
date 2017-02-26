@@ -122,20 +122,19 @@ exports = module.exports = {
 		return rs;
 	},
 
-	async insert(item, dbo) {
+	async insert(item, dbo, cached) {
 		item = exports.validate(item, exports.VALIDATE.INSERT);
 
-		let cached;
 		dbo = await db.open(exports.COLLECTION, dbo);		
 		try {
 			const rs = await dbo.insert(item);
 
-			cached = cachedService.open();
+			cached = cachedService.open(cached);
 			await exports.refeshCached(item.project_id, cached, dbo);
 
 			return rs;
 		} finally {
-			if(cached) await cached.close();
+			if(cached.isnew) await cached.close();
 			if(dbo.isnew) await dbo.close();
 		}
 	},
