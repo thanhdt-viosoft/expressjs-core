@@ -101,149 +101,126 @@ exports = module.exports = {
 		return item;
 	},
 
-	async getCached(token, cached){
-		return await cached.get(`login.${token}`);
+	async getCached(token){
+		return await cachedService.get(`login.${token}`);
 	},
 
 	async authBySecretKey(secretKey){
-		const cached = cachedService.open();
-		try {
-			let user = await cached.get(`login.${secretKey}`);
-			if(!user) {
-				const dbo = await db.open(exports.COLLECTION);
-				user = await dbo.get({
-					$where: { secret_key: secretKey, status: exports.STATUS.ACTIVE },
-					$fields: { token: 1, status: 1, _id: 1, project_id: 1, role_ids: 1 }
-				}, db.DONE);
-				if(!user) throw Error.create(Error.AUTHEN, "Secret key is not correct");
-				await cached.set(`login.${secretKey}`, user);
-			}
-			return `${user.project_id}-${user._id}-${secretKey}`;
-		} finally {
-			await cached.close();
+		let user = await cachedService.get(`login.${secretKey}`);
+		if(!user) {
+			user = await db.get(exports.COLLECTION, {
+				$where: { secret_key: secretKey, status: exports.STATUS.ACTIVE },
+				$fields: { token: 1, status: 1, _id: 1, project_id: 1, role_ids: 1 }
+			});
+			if(!user) throw Error.create(Error.AUTHEN, "Secret key is not correct");
+			await cachedService.set(`login.${secretKey}`, user);
 		}
+		return `${user.project_id}-${user._id}-${secretKey}`;
 	},
 
 	async login(item = {}) {		
-		let cached;
 		let where = {
 			username: item.username,
 			project_id: item.project_id
-		};		
-		const dbo = await db.open(exports.COLLECTION);		
-		try {
-			const user = await dbo.get({
-				$where: where,
-				$fields: { password: 1, app: 1, token: 1, status: 1, _id: 1, project_id: 1, role_ids: 1 }
-			});
-			if(!user) throw Error.create(Error.NOT_FOUND, `Could not found username ${item.username}`);
-			exports.validate({userClient: item, userServer: user}, exports.VALIDATE.LOGIN);			
-			delete user.password;
-			delete user.api;
-			const projectService = require('./project.service');
-			cached = cachedService.open();
-			const project = await projectService.getCached(user.project_id, cached);			
-			if(!project.plugins.oauthv2) throw Error.create(Error.INTERNAL, 'Oauthv2 plugin not config yet');
-			if(project.plugins.oauthv2.single_mode === true) await cached.del(`login.${user.token}`);
-			user.token = db.uuid();
-			await dbo.update(user);
-			await cached.set(`login.${user.token}`, user, project.plugins.oauthv2.session_expired);
-			return `${user.project_id}-${user._id}-${user.token}`;
-		} finally {
-			if(cached) await cached.close();
-			await dbo.close();
-		}
+		};
+		const user = await db.get(exports.COLLECTION, {
+			$where: where,
+			$fields: { password: 1, app: 1, token: 1, status: 1, _id: 1, project_id: 1, role_ids: 1 }
+		});
+		if(!user) throw Error.create(Error.NOT_FOUND, `Could not found username ${item.username}`);
+		exports.validate({userClient: item, userServer: user}, exports.VALIDATE.LOGIN);			
+		delete user.password;
+		delete user.api;
+		const projectService = require('./project.service');
+		const project = await projectService.getCached(user.project_id);			
+		if(!project.plugins.oauthv2) throw Error.create(Error.INTERNAL, 'Oauthv2 plugin not config yet');
+		if(project.plugins.oauthv2.single_mode === true) await cachedService.del(`login.${user.token}`);
+		user.token = db.uuid();
+		await db.update(exports.COLLECTION, user);
+		await cachedService.set(`login.${user.token}`, user, project.plugins.oauthv2.session_expired);
+		return `${user.project_id}-${user._id}-${user.token}`;
 	},
 
 	async logout(token){
-		let cached = await cachedService.open();
-		cached.del(`login.${token}`);
-		await cached.close();
+		cachedService.del(`login.${token}`);
 	},
 
 	async authoriz(auth) {
 		auth = exports.validate(auth, exports.VALIDATE.AUTHORIZ);
-		const cached = cachedService.open();
-		try {
-			const user = await exports.getCached(auth.secretToken, cached);
-			if(!user) throw Error.create(Error.EXPIRED, 'Session was expired');
-			const roleService = require('./role.service');auth.projectId.toString()
-			const roles = await roleService.getCached(auth.projectId, cached) || [];
-			for(let role of roles.filter((e) => {
-				return user.role_ids.map((id) => {
-					return id.toString();
-				}).indexOf(e._id.toString()) !== -1;
-			})){
-				for(let r of role.api) {
-					if(new RegExp(`^${r.path}$`, 'gi').test(auth.path) && _.some(auth.actions, (a) => {
-						for(var auAction of r.actions){
-							if(new RegExp(`^${auAction}$`, 'gi').test(a)){
-								return true;
-							}
+		const user = await exports.getCached(auth.secretToken);
+		if(!user) throw Error.create(Error.EXPIRED, 'Session was expired');
+		const roleService = require('./role.service');auth.projectId.toString()
+		const roles = await roleService.getCached(auth.projectId) || [];
+		for(let role of roles.filter((e) => {
+			return user.role_ids.map((id) => {
+				return id.toString();
+			}).indexOf(e._id.toString()) !== -1;
+		})){
+			for(let r of role.api) {
+				if(new RegExp(`^${r.path}$`, 'gi').test(auth.path) && _.some(auth.actions, (a) => {
+					for(var auAction of r.actions){
+						if(new RegExp(`^${auAction}$`, 'gi').test(a)){
+							return true;
 						}
-						return false;
-					})){
-						return;
 					}
+					return false;
+				})){
+					return;
 				}
-			}	
-			throw Error.create(Error.AUTHORIZ, 'Not allow access');
-		} finally {
-			await cached.close();
-		}
+			}
+		}	
+		throw Error.create(Error.AUTHORIZ, 'Not allow access');
 	},
 
 	async ping(auth) {
-		const cached = cachedService.open();
-		try {
-			const user = await exports.getCached(auth.secretToken, cached);
-			if(!user) throw Error.create(Error.EXPIRED, 'Session was expired');
-			const projectService = require('./project.service');
-			const project = await projectService.getCached(user.project_id, cached);
-			await cached.touch(`login.${auth.secretToken}`, project.plugins.oauthv2.session_expired);
-		} finally {
-			cached.close();
-		}
+		const user = await exports.getCached(auth.secretToken);
+		if(!user) throw Error.create(Error.EXPIRED, 'Session was expired');
+		const projectService = require('./project.service');
+		const project = await projectService.getCached(user.project_id);
+		await cachedService.touch(`login.${auth.secretToken}`, project.plugins.oauthv2.session_expired);
 	},
 
-	async find(fil = {}, dbo) {
+	async find(fil = {}) {
 		fil = exports.validate(fil, exports.VALIDATE.FIND);
-
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.find(fil, dbo.isnew ? db.DONE : db.FAIL);
+		const rs = await db.find(exports.COLLECTION, fil);
 		return rs;
 	},
 
-	async get(_id, dbo) {
+	async get(_id) {
 		_id = exports.validate(_id, exports.VALIDATE.GET);
-
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.get(_id, dbo.isnew ? db.DONE : db.FAIL);
-		return rs;
+		return await db.get(exports.COLLECTION, _id);
 	},
 
-	async getMe(_id, dbo) {
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.get(_id, dbo.isnew ? db.DONE : db.FAIL);
-		return rs;
+	async getMe(_id) {
+		return await db.get(exports.COLLECTION, _id);
 	},
 
-	async insert(item, auth, dbo, cached) {
+	async insert(item, auth) {
 		item = exports.validate(item, exports.VALIDATE.INSERT);
-
-		dbo = await db.open(exports.COLLECTION, dbo);
-		try {
-			const existedUser = await dbo.get({
-				username: item.username,
-				project_id: item.project_id
-			});
-			if(existedUser) throw Error.create(Error.BAD_REQUEST, `User ${item.username} was existed`);
-			cached = cachedService.open(cached);
-			const projectService = require('./project.service');	
-			const defaultAdmin = await dbo.get({is_nature: true});
-			if(!defaultAdmin) throw Error.create(Error.INTERNAL, 'Could not found default admin');
-			const project = await projectService.getCached(item.project_id, cached);			
-			if(item.is_nature) {
+		const existedUser = await db.get(exports.COLLECTION, {
+			username: item.username,
+			project_id: item.project_id
+		});
+		if(existedUser) throw Error.create(Error.BAD_REQUEST, `User ${item.username} was existed`);
+		const projectService = require('./project.service');	
+		const defaultAdmin = await db.get(exports.COLLECTION, {is_nature: true});
+		if(!defaultAdmin) throw Error.create(Error.INTERNAL, 'Could not found default admin');
+		const project = await projectService.getCached(item.project_id);			
+		if(item.is_nature) {
+			const microService = require('../service/micro.service');
+			await microService.sendMail({
+				title: `You are assigned in project ${project.name}`,
+				content: `This is your account information which allow you <a href="${global.appconfig.auth.url}/dist/index.htm#!?id=${item.project_id}">login</a> and use some our service
+<br/>Username: ${item.username}
+<br/>Password: ${item.password0}
+<br/>`,
+				config_name: 'admin',
+				html: true,
+				to: [item.recover_by]
+			}, auth);
+		}else {
+			if(project.plugins.oauthv2.is_verify === true) {
+				item.status = 0;
 				const microService = require('../service/micro.service');
 				await microService.sendMail({
 					title: `You are assigned in project ${project.name}`,
@@ -254,117 +231,68 @@ exports = module.exports = {
 					config_name: 'admin',
 					html: true,
 					to: [item.recover_by]
-				}, auth);
-			}else {
-				if(project.plugins.oauthv2.is_verify === true) {
-					item.status = 0;
-					const microService = require('../service/micro.service');
-					await microService.sendMail({
-						title: `You are assigned in project ${project.name}`,
-						content: `This is your account information which allow you <a href="${global.appconfig.auth.url}/dist/index.htm#!?id=${item.project_id}">login</a> and use some our service
-		<br/>Username: ${item.username}
-		<br/>Password: ${item.password0}
-		<br/>`,
-						config_name: 'admin',
-						html: true,
-						to: [item.recover_by]
-					}, {
-						secret_key: defaultAdmin.secret_key
-					});
-				} else {
-					item.status = 1;
-				}
-			}
-			delete item.password0;
-			const rs = await dbo.insert(item);
-			return rs;
-		} finally {
-			if(cached.isnew) await cached.close();
-			if(dbo.isnew) await dbo.close();
-		}		
-	},
-
-	async update(item, dbo) {
-		item = exports.validate(item, exports.VALIDATE.UPDATE);
-
-		let cached;
-		dbo = await db.open(exports.COLLECTION, dbo);
-		try {
-			let oldItem;
-			if(item.secret_key || item.role_ids) {
-				oldItem = await dbo.get(item._id);
-				if(_.isEqual(item.role_ids.sort(), oldItem.role_ids.sort())) {
-					delete oldItem;
-				}
-			}
-			const rs = await dbo.update(item);
-			if(oldItem) {
-				cached = cachedService.open();
-				if(item.secret_key) await cached.del(`login.${oldItem.secret_key}`);					
-							
-				const user = await dbo.get({
-					$where: { _id: oldItem._id },
-					$fields: { token: 1, status: 1, _id: 1, project_id: 1, role_ids: 1 }
+				}, {
+					secret_key: defaultAdmin.secret_key
 				});
-				const secretKey = await cached.get(`login.${user.secret_key}`);					
-				const token = await cached.get(`login.${user.token}`);
-				if(secretKey) await cached.set(`login.${user.secret_key}`, user);
-				if(token) await cached.set(`login.${user.token}`, user);
+			} else {
+				item.status = 1;
 			}
-			return rs;
-		} finally {
-			if(cached) await cached.close();
-			if(dbo.isnew) await dbo.close();
 		}
+		delete item.password0;
+		return await db.insert(exports.COLLECTION, item);
 	},
 
-	async deleteAll(projectId, dbo) {
-		let cached;
-		dbo = await db.open(exports.COLLECTION, dbo);		
-		try {
-			const oldUsers = await dbo.find({
-				$where: {
-					project_id: projectId
-				},
-				$fields: {
-					secret_key: 1, 
-					token: 1
-				}
-			});
-			const rs = await dbo.delete({
-				project_id: projectId
-			});
-			cached = cachedService.open();
-			for(let oldUser of oldUsers) {
-				await cached.del(`login.${oldUser.secret_key}`);
-				await cached.del(`login.${oldUser.token}`);
+	async update(item) {
+		item = exports.validate(item, exports.VALIDATE.UPDATE);
+		let oldItem;
+		if(item.secret_key || item.role_ids) {
+			oldItem = await db.get(exports.COLLECTION, item._id);
+			if(_.isEqual(item.role_ids.sort(), oldItem.role_ids.sort())) {
+				delete oldItem;
 			}
-			return rs;
-		} finally {
-			if(cached) await cached.close();
-			if(dbo.isnew) await dbo.close();
-		}		
-
+		}
+		const rs = await db.update(exports.COLLECTION, item);
+		if(oldItem) {
+			if(item.secret_key) await cachedService.del(`login.${oldItem.secret_key}`);					
+						
+			const user = await db.get(exports.COLLECTION, {
+				$where: { _id: oldItem._id },
+				$fields: { token: 1, status: 1, _id: 1, project_id: 1, role_ids: 1 }
+			});
+			const secretKey = await cachedService.get(`login.${user.secret_key}`);					
+			const token = await cachedService.get(`login.${user.token}`);
+			if(secretKey) await cachedService.set(`login.${user.secret_key}`, user);
+			if(token) await cachedService.set(`login.${user.token}`, user);
+		}
 		return rs;
 	},
 
-	async delete(_id, dbo) {
+	async deleteAll(projectId) {
+		const oldUsers = await db.find(exports.COLLECTION, {
+			$where: {
+				project_id: projectId
+			},
+			$fields: {
+				secret_key: 1, 
+				token: 1
+			}
+		});
+		const rs = await db.delete(exports.COLLECTION, {
+			project_id: projectId
+		});
+		for(let oldUser of oldUsers) {
+			await cachedService.del(`login.${oldUser.secret_key}`);
+			await cachedService.del(`login.${oldUser.token}`);
+		}
+		return rs;
+	},
+
+	async delete(_id) {
 		_id = exports.validate(_id, exports.VALIDATE.DELETE);
-
-		let cached;
-		dbo = await db.open(exports.COLLECTION, dbo);		
-		try {
-			const oldItem = dbo.get(_id);
-			const rs = await dbo.delete(_id);
-			cached = cachedService.open();
-			await cached.del(`login.${oldItem.secret_key}`);
-			await cached.del(`login.${oldItem.token}`);
-			return rs;
-		} finally {
-			if(cached) await cached.close();
-			if(dbo.isnew) await dbo.close();
-		}		
-
+		const oldItem = db.get(exports.COLLECTION, _id);
+		const rs = await db.delete(exports.COLLECTION, _id);
+		await cachedService.del(`login.${oldItem.secret_key}`);
+		await cachedService.del(`login.${oldItem.token}`);
 		return rs;
 	}
 

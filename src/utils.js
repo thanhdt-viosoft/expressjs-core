@@ -37,9 +37,7 @@ exports = module.exports = _.extend(require('../lib/core/utils'), {
             if(isAutoCheckInCache){
                 const accountService = require('./service/account.service');
                 const cacheService = require('./service/cached.service');
-                const cached = cacheService.open();
-                let user = await accountService.getCached(req.auth.secretToken, cached);
-                await cached.close();
+                let user = await accountService.getCached(req.auth.secretToken);
                 if(!user) return next(Error.create(Error.EXPIRED));
             }
             next();

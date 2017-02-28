@@ -73,161 +73,121 @@ exports = module.exports = {
 		return item;
 	},
 
-	async getCached(projectId, cached){
-		return await cached.get(`project.${projectId}`);
+	async getCached(projectId){
+		return await cachedService.get(`project.${projectId}`);
 	},
 
 	async getConfig(projectId, plugin){
-		let cached = cachedService.open();
-		try {			
-			const rs = await exports.getCached(projectId, cached)
-			if(plugin) return rs.plugins[plugin];
-			return rs;
-		} finally {
-			await cached.close();
-		}
+		const rs = await exports.getCached(projectId)
+		if(plugin) return rs.plugins[plugin];
+		return rs;
 	},
 	
-	async initConfig(_id, config, dbo) {
+	async initConfig(_id, config) {
 		config = exports.validate(config, exports.VALIDATE.UPDATE_CONFIG);
-
-		dbo = await db.open(exports.COLLECTION, dbo);
-		try {
-			const oldItem = await dbo.get({
-				$where: {
-					_id: _id
-				},
-				$fields: {
-					_id: 1,
-					plugins: 1
-				}
-			});
-			oldItem.plugins = _.merge({}, config, oldItem.plugins);
-			const rs = await dbo.update(oldItem);
-			return rs;
-		} finally {
-			if(dbo.isnew) await dbo.close();
-		}
+		const oldItem = await db.get(exports.COLLECTION, {
+			$where: {
+				_id: _id
+			},
+			$fields: {
+				_id: 1,
+				plugins: 1
+			}
+		});
+		oldItem.plugins = _.merge({}, config, oldItem.plugins);
+		const rs = await db.update(exports.COLLECTION, oldItem);
+		return rs;
 	},
 
-	async refeshCached(projectId, project, cached, dbo) {
+	async refeshCached(projectId, project) {
 		const roleService = require('./role.service');
 		if(project) {
-			await cached.set(`project.${projectId}`, project);			
-			await roleService.refeshCached(projectId, cached, dbo, false);	
+			await cachedService.set(`project.${projectId}`, project);			
+			await roleService.refeshCached(projectId, false);	
 		}else {
-			await cached.del(`project.${projectId}`);
-			await roleService.refeshCached(projectId, cached, dbo, true);	
+			await cachedService.del(`project.${projectId}`);
+			await roleService.refeshCached(projectId, true);	
 		}
 	},
 
-	async find(fil = {}, dbo) {
+	async find(fil = {}) {
 		fil = exports.validate(fil, exports.VALIDATE.FIND);
 
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.find(fil, dbo.isnew ? db.DONE : db.FAIL);
+		const rs = await db.find(exports.COLLECTION, fil);
 		return rs;
 	},
 
-	async get(_id, dbo) {
+	async get(_id) {
 		_id = exports.validate(_id, exports.VALIDATE.GET);
 
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.get(_id, dbo.isnew ? db.DONE : db.FAIL);
+		const rs = await db.get(exports.COLLECTION, _id);
 		return rs;
 	},
 
-	async insert(item, auth, dbo) {
+	async insert(item, auth) {
 		const email = _.clone(item.email);
 		delete item.email;
 		item = exports.validate(item, exports.VALIDATE.INSERT);
-
-		let cached;
-		dbo = await db.open(exports.COLLECTION, dbo);
-		try {
-			const rs = await dbo.insert(item);
-			
-			const roleService = require('./role.service');
-			const eycrypt = require('../../lib/core/encrypt');
-			const accountService = require('./account.service');
-
-			cached = cachedService.open();
-
-			const role = await roleService.insert({
-				project_id: rs._id,
-				name: 'Admin',
-				api: [{
-					path: '.*',
-					actions: ['.*']
-				}],
-				web: [{
-					path: '.*',
-					actions: ['.*']
-				}],
-				mob: [{
-					path: '.*',
-					actions: ['.*']
-				}]
-			}, dbo, cached);	
-			
-			await exports.refeshCached(rs._id, rs, cached, dbo);
-
-			const randomPass = utils.uuid().toString().substr(0, 6);
-			const username = 'admin';
-			const account = await accountService.insert({
-				project_id: rs._id,
-				username: username,
-				password0: randomPass,
-				password: eycrypt.md5(randomPass),
-				status: 1,
-				recover_by: email,
-				is_nature: true,
-				role_ids: [role._id],
-				more: {}
-			}, auth, dbo, cached);			
-			return rs;
-		} finally{
-			if(cached.isnew) await cached.close();
-			if(dbo.isnew) await dbo.close();
-		}
-	},
-
-	async update(item, dbo) {
-		item = exports.validate(item, exports.VALIDATE.UPDATE);
-
-		let cached;
-		dbo = await db.open(exports.COLLECTION, dbo);
-		try {
-			const rs = await dbo.update(item);
-			const newItem = await dbo.get(item._id);
-			cached = cachedService.open();
-			await exports.refeshCached(newItem._id, newItem, cached, dbo);
-
-			return rs;
-		}finally{
-			if(cached) await cached.close();
-			if(dbo.isnew) await dbo.close();
-		}
-	},
-
-	async delete(_id, dbo) {
-		_id = exports.validate(_id, exports.VALIDATE.DELETE);
 		
-		let cached;
-		dbo = await db.open(exports.COLLECTION, dbo);
-		try {
-			const rs = await dbo.delete(_id, dbo.isnew ? db.DONE : db.FAIL);
-			const roleService = require('./role.service');
-			const accountService = require('./account.service');
-			await roleService.deleteAll(_id, dbo);
-			await accountService.deleteAll(_id, dbo);
-			cached = cachedService.open();
-			exports.refeshCached(_id, null, cached, dbo);
-			return rs;
-		} finally{
-			if(cached) await cached.close();
-			if(dbo.isnew) await dbo.close();
-		}
+		const rs = await db.insert(exports.COLLECTION, item);
+		
+		const roleService = require('./role.service');
+		const eycrypt = require('../../lib/core/encrypt');
+		const accountService = require('./account.service');
+
+		const role = await roleService.insert({
+			project_id: rs._id,
+			name: 'Admin',
+			api: [{
+				path: '.*',
+				actions: ['.*']
+			}],
+			web: [{
+				path: '.*',
+				actions: ['.*']
+			}],
+			mob: [{
+				path: '.*',
+				actions: ['.*']
+			}]
+		});	
+		
+		await exports.refeshCached(rs._id, rs);
+
+		const randomPass = utils.uuid().toString().substr(0, 6);
+		const username = 'admin';
+		const account = await accountService.insert({
+			project_id: rs._id,
+			username: username,
+			password0: randomPass,
+			password: eycrypt.md5(randomPass),
+			status: 1,
+			recover_by: email,
+			is_nature: true,
+			role_ids: [role._id],
+			more: {}
+		}, auth);	
+
+		return rs;
+	},
+
+	async update(item) {
+		item = exports.validate(item, exports.VALIDATE.UPDATE);
+		const rs = await db.update(exports.COLLECTION, item);
+		const newItem = await db.get(exports.COLLECTION, item._id);
+		await exports.refeshCached(newItem._id, newItem);
+		return rs;
+	},
+
+	async delete(_id) {
+		_id = exports.validate(_id, exports.VALIDATE.DELETE);
+		const rs = await db.delete(exports.COLLECTION, _id);
+		const roleService = require('./role.service');
+		const accountService = require('./account.service');
+		await roleService.deleteAll(_id);
+		await accountService.deleteAll(_id);
+		exports.refeshCached(_id, null);
+		return rs;
 	}
 
 }
