@@ -138,6 +138,7 @@ exports = module.exports = {
 		const role = await roleService.insert({
 			project_id: rs._id,
 			name: 'Admin',
+			is_nature: true,
 			api: [{
 				path: '.*',
 				actions: ['.*']
@@ -160,7 +161,7 @@ exports = module.exports = {
 			project_id: rs._id,
 			username: username,
 			password0: randomPass,
-			password: eycrypt.md5(randomPass),
+			password: eycrypt.md5(eycrypt.md5(randomPass)),
 			status: 1,
 			recover_by: email,
 			is_nature: true,

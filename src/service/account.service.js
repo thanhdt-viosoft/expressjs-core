@@ -210,7 +210,7 @@ exports = module.exports = {
 			const microService = require('../service/micro.service');
 			await microService.sendMail({
 				title: `You are assigned in project ${project.name}`,
-				content: `This is your account information which allow you <a href="${global.appconfig.auth.url}/dist/index.htm#!?id=${item.project_id}">login</a> and use some our service
+				content: `This is your account information which allow you <a href="${global.appconfig.manager.url}/?id=${item.project_id}">login</a> and use some our service
 <br/>Username: ${item.username}
 <br/>Password: ${item.password0}
 <br/>`,
@@ -219,24 +219,7 @@ exports = module.exports = {
 				to: [item.recover_by]
 			}, auth);
 		}else {
-			if(project.plugins.oauthv2.is_verify === true) {
-				item.status = 0;
-				const microService = require('../service/micro.service');
-				await microService.sendMail({
-					title: `You are assigned in project ${project.name}`,
-					content: `This is your account information which allow you <a href="${global.appconfig.auth.url}/dist/index.htm#!?id=${item.project_id}">login</a> and use some our service
-	<br/>Username: ${item.username}
-	<br/>Password: ${item.password0}
-	<br/>`,
-					config_name: 'admin',
-					html: true,
-					to: [item.recover_by]
-				}, {
-					secret_key: defaultAdmin.secret_key
-				});
-			} else {
-				item.status = 1;
-			}
+			item.status = project.plugins.oauthv2.is_verify === true ? exports.STATUS.ACTIVE : exports.STATUS.INACTIVE;
 		}
 		delete item.password0;
 		return await db.insert(exports.COLLECTION, item);
