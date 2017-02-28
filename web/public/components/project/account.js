@@ -66,6 +66,8 @@ module.exports = {
             delete self._account.repwd;
 
             Account.update(self._account).then((res) => {
+                self._account.password = '';
+                self._account.repwd = '';
                 this.closeModal();
             });
         };

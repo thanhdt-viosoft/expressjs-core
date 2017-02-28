@@ -58,7 +58,7 @@ let js = loadJs(path.join(__dirname, 'public', 'assets', 'js'), '../public/asset
 let com = loadComponents(path.join(__dirname, 'public', 'components'), '../public/components');
 
 content.push(`require([${js.join(',\n\t\t')}], (angular) => {
-    global.app = angular.module('myApp', ['ngComponentRouter']).value('$routerRootComponent', 'myApp');
+    global.app = angular.module('myApp', ['ngComponentRouter', 'angular-md5']).value('$routerRootComponent', 'myApp');
     require([${com.join(',\n\t\t\t')}], (...com) => {
         for (var i in com) {
             if (i == 0) global.app.constant('$config', com[i]);

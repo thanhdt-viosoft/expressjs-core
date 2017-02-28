@@ -2,6 +2,7 @@ module.exports = {
     UtilsService: ['$window', function($window) {
         return {
             throwError(err){
+                err.msg = err.msg || err.data;
                 $window.top.postMessage(JSON.stringify(err), '*');
             }
         }
@@ -47,19 +48,22 @@ module.exports = {
             }
         };
     }],
-    Account: ['$http', '$rootScope', '$config', 'UtilsService', function($http, $rootScope, $config, UtilsService) {
+    Account: ['$http', '$rootScope', '$config', 'UtilsService', 'md5', function($http, $rootScope, $config, UtilsService, md5) {
         return {
             get: () => {
                 return $http.get(`${$config.apiUrl}/account`).catch(UtilsService.throwError);
             },
             login : (data, projectId) => {
+                data = _.clone(data);
+                data.password = md5.createHash(data.password);
                 return $http.post(`${$config.apiUrl}/login`, data, {headers : {pj: projectId}}).catch(UtilsService.throwError);
             },
             logout(){
                 return $http.post(`${$config.apiUrl}/logout`).catch(UtilsService.throwError);
             },
             add: (data) => {
-                // return $http.post(`${$config.apiUrl}/register`, data).catch(UtilsService.throwError);
+                data = _.clone(data);
+                data.password = md5.createHash(data.password);
                 return $http.post(`${$config.apiUrl}/account`, data).catch(UtilsService.throwError);
             },
             author: (data) => {
@@ -69,6 +73,8 @@ module.exports = {
                 return $http.head(`${$config.apiUrl}/ping`).catch(UtilsService.throwError);
             },
             update: (account) => {
+                if(account.password) account = _.clone(account);
+                account.password = md5.createHash(account.password);
                 return $http.put(`${$config.apiUrl}/account/${account._id}`, account).catch(UtilsService.throwError);
             },
             getDetail(id) {
