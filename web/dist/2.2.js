@@ -10,14 +10,10 @@ webpackJsonp([2],[
 /* 8 */
 /***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 
 	module.exports = {
-	    apiUrl: 'http://192.168.0.111:9600',
-	    services: {
-	        oauthv2: 'http://192.168.0.111:9600',
-	        mail: 'http://192.168.0.111:9602'
-	    }
+	    // never use services in there
 	};
 
 /***/ },
@@ -36,9 +32,17 @@ webpackJsonp([2],[
 
 	/* WEBPACK VAR INJECTION */(function(angular) {'use strict';
 
-	module.exports = ['$rootScope', '$location', '$http', '$window', 'Account', function ($rootScope, $location, $http, $window, Account) {
+	module.exports = ['$location', '$http', '$window', '$config', function ($location, $http, $window, $config) {
 	    $http.defaults.headers.common.token = $location.search().session;
 	    angular.element($window.document).find('head').append('<link href="' + $location.search().theme + '" rel="stylesheet" type="text/css" />');
+	    $config.services = $window.localStorage.services ? JSON.parse($window.localStorage.services) : '';
+	    $window.onmessage = function (e) {
+	        var data = JSON.parse(e.data);
+	        if (data.type === 'INIT') {
+	            $window.localStorage.services = JSON.stringify(data.data);
+	            $config.services = data.data;
+	        }
+	    };
 	}];
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
@@ -94,9 +98,9 @@ webpackJsonp([2],[
 	              if (scope.size) {
 	                var ii = backgroundSrc.lastIndexOf('/');
 	                backgroundSrc = backgroundSrc.substr(0, ii + 1) + scope.size + backgroundSrc.substr(ii);
-	                element[i].style.backgroundImage = 'url(' + $config.apiUrl + backgroundSrc + '), url(' + __webpack_require__(12) + ')';
+	                element[i].style.backgroundImage = 'url(' + $config.services.oauth + backgroundSrc + '), url(' + __webpack_require__(12) + ')';
 	              } else {
-	                element[i].style.backgroundImage = 'url(' + $config.apiUrl + backgroundSrc + ')';
+	                element[i].style.backgroundImage = 'url(' + $config.services.oauth + backgroundSrc + ')';
 	              }
 	            } else {
 	              element[i].style.backgroundImage += 'url(' + __webpack_require__(12) + ')';
@@ -127,8 +131,8 @@ webpackJsonp([2],[
 	                var ii = imageSrc.lastIndexOf('/');
 	                imageSrc = imageSrc.substr(0, ii + 1) + scope.size + imageSrc.substr(ii);
 	              }
-	              console.log($config.apiUrl + imageSrc);
-	              ee.setAttribute('src', $config.apiUrl + imageSrc);
+	              console.log($config.services.oauth + imageSrc);
+	              ee.setAttribute('src', $config.services.oauth + imageSrc);
 	            }
 	          } else {
 	            ee.setAttribute('src', __webpack_require__(12));
@@ -186,87 +190,90 @@ webpackJsonp([2],[
 	        return {
 	            throwError: function throwError(err) {
 	                err.msg = err.msg || err.data;
-	                $window.top.postMessage(JSON.stringify(err), '*');
+	                $window.top.postMessage(JSON.stringify({ type: 'ERROR', data: err }), '*');
 	            }
 	        };
 	    }],
 	    Project: ['$http', '$rootScope', '$config', '$window', '$location', 'UtilsService', function ($http, $rootScope, $config, $window, $location, UtilsService) {
 	        return {
-	            config: function config(key) {
+	            initConfig: function initConfig(key) {
 	                return $http.post($config.services[key] + '/config').catch(UtilsService.throwError);
 	            },
 
+	            updateConfig: function updateConfig(data) {
+	                return $http.put($config.services.oauth + '/config', data).catch(UtilsService.throwError);
+	            },
 	            get: function get() {
-	                return $http.get($config.apiUrl + '/project').catch(UtilsService.throwError);
+	                return $http.get($config.services.oauth + '/project').catch(UtilsService.throwError);
 	            },
 	            add: function add(data) {
-	                return $http.post($config.apiUrl + '/project', data).catch(UtilsService.throwError);
+	                return $http.post($config.services.oauth + '/project', data).catch(UtilsService.throwError);
 	            },
 	            update: function update(data) {
-	                return $http.put($config.apiUrl + '/project', data).catch(UtilsService.throwError);
+	                return $http.put($config.services.oauth + '/project', data).catch(UtilsService.throwError);
 	            },
 	            getDetail: function getDetail(id) {
-	                return $http.get($config.apiUrl + '/project/' + id).catch(UtilsService.throwError);
+	                return $http.get($config.services.oauth + '/project/' + id).catch(UtilsService.throwError);
 	            },
 	            delete: function _delete(id) {
-	                return $http.delete($config.apiUrl + '/project/' + id).catch(UtilsService.throwError);
+	                return $http.delete($config.services.oauth + '/project/' + id).catch(UtilsService.throwError);
 	            }
 	        };
 	    }],
 	    Role: ['$http', '$rootScope', '$config', 'UtilsService', function ($http, $rootScope, $config, UtilsService) {
 	        return {
 	            get: function get() {
-	                return $http.get($config.apiUrl + '/role').catch(UtilsService.throwError);
+	                return $http.get($config.services.oauth + '/role').catch(UtilsService.throwError);
 	            },
 	            add: function add(data) {
-	                return $http.post($config.apiUrl + '/role', data).catch(UtilsService.throwError);
+	                return $http.post($config.services.oauth + '/role', data).catch(UtilsService.throwError);
 	            },
 	            update: function update(data) {
-	                return $http.put($config.apiUrl + '/role/' + data._id, data).catch(UtilsService.throwError);
+	                return $http.put($config.services.oauth + '/role/' + data._id, data).catch(UtilsService.throwError);
 	            },
 	            getDetail: function getDetail(id) {
-	                return $http.get($config.apiUrl + '/role/' + id).catch(UtilsService.throwError);
+	                return $http.get($config.services.oauth + '/role/' + id).catch(UtilsService.throwError);
 	            },
 	            delete: function _delete(id) {
-	                return $http.delete($config.apiUrl + '/role/' + id).catch(UtilsService.throwError);
+	                return $http.delete($config.services.oauth + '/role/' + id).catch(UtilsService.throwError);
 	            }
 	        };
 	    }],
 	    Account: ['$http', '$rootScope', '$config', 'UtilsService', 'md5', function ($http, $rootScope, $config, UtilsService, md5) {
 	        return {
 	            get: function get() {
-	                return $http.get($config.apiUrl + '/account').catch(UtilsService.throwError);
+	                return $http.get($config.services.oauth + '/account').catch(UtilsService.throwError);
 	            },
 	            login: function login(data, projectId) {
 	                data = _.clone(data);
 	                data.password = md5.createHash(data.password);
-	                return $http.post($config.apiUrl + '/login', data, { headers: { pj: projectId } }).catch(UtilsService.throwError);
+	                return $http.post($config.services.oauth + '/login', data, { headers: { pj: projectId } }).catch(UtilsService.throwError);
 	            },
 	            logout: function logout() {
-	                return $http.post($config.apiUrl + '/logout').catch(UtilsService.throwError);
+	                return $http.post($config.services.oauth + '/logout').catch(UtilsService.throwError);
 	            },
 
 	            add: function add(data) {
 	                data = _.clone(data);
 	                data.password = md5.createHash(data.password);
-	                return $http.post($config.apiUrl + '/account', data).catch(UtilsService.throwError);
+	                return $http.post($config.services.oauth + '/account', data).catch(UtilsService.throwError);
 	            },
 	            author: function author(data) {
-	                return $http.head($config.apiUrl + '/authoriz', { headers: data }).catch(UtilsService.throwError);
+	                return $http.head($config.services.oauth + '/authoriz', { headers: data }).catch(UtilsService.throwError);
 	            },
 	            ping: function ping(data) {
-	                return $http.head($config.apiUrl + '/ping').catch(UtilsService.throwError);
+	                return $http.head($config.services.oauth + '/ping').catch(UtilsService.throwError);
 	            },
 	            update: function update(account) {
 	                if (account.password) account = _.clone(account);
 	                account.password = md5.createHash(account.password);
-	                return $http.put($config.apiUrl + '/account/' + account._id, account).catch(UtilsService.throwError);
+	                return $http.put($config.services.oauth + '/account/' + account._id, account).catch(UtilsService.throwError);
 	            },
 	            getDetail: function getDetail(id) {
-	                return $http.get($config.apiUrl + '/account/' + id).catch(UtilsService.throwError);
+	                return $http.get($config.services.oauth + '/account/' + id).catch(UtilsService.throwError);
 	            },
 	            delete: function _delete(id) {
-	                return $http.delete($config.apiUrl + '/account/' + id).catch(UtilsService.throwError);
+	                return $http.delete($config.services.oauth + '/account/' + id).catch(UtilsService.throwError);
 	            }
 	        };
 	    }]
@@ -651,7 +658,7 @@ webpackJsonp([2],[
 	    controller: ['$config', 'Role', 'Account', '$location', function ($config, Role, Account, $location) {
 	        var _this = this;
 
-	        __webpack_require__(23);
+	        // require('./account.scss');
 
 	        var self = this;
 	        self._account = {};
@@ -755,49 +762,11 @@ webpackJsonp([2],[
 /* 22 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"_table-layer\">\r\n  \r\n  <table style=\"width:100%\">\r\n    <tr>\r\n      <td>\r\n        <button ng-click=\"$ctrl.showModal('add',{})\" style=\"padding: 4px 10px;font-size: 15px;margin-top: -6px;\">Add user</button>\r\n      </td>\r\n      <td>\r\n          <input style=\"float: right;padding: 5px;width: 250px;\" class=\"form-control\" placeholder=\"Enter keyword for searching\" type=\"text\" ng-model=\"$ctrl._kword\">\r\n      </td>\r\n    </tr>\r\n  </table>\r\n\r\n    <table class=\"table\">\r\n      <thead>\r\n      <tr>\r\n        <th>Username</th>\r\n        <th>Status</th>\r\n        <th>Role</th>\r\n        <th>Created date</th>\r\n        <th></th>\r\n      </tr>\r\n      </thead>\r\n      <tbody>\r\n      <tr ng-repeat=\"item in $ctrl._accounts | filter : $ctrl._kword\">\r\n        <td>{{item.username}}</td>\r\n        <td>{{item.status=='1'?'Activate':'Deactivate'}}</td>\r\n        <td>{{$ctrl.getID2LabelRole(item.role_ids)}}</td>\r\n        <td>{{item.created_at | date:'yyyy-MM-dd HH:mm'}}</td>\r\n        <td style=\"text-align: right;\">\r\n          <label class=\"_link padding-right5\" ng-click=\"$ctrl.showModal('edit', item)\">Edit</label>\r\n          <label class=\"_link\" ng-click=\"$ctrl.showModal('delete', item)\">Delete</label>\r\n        </td>\r\n      </tr>\r\n      </tbody>\r\n    </table>\r\n</div>\r\n\r\n<dialog id=\"favDialog\" class=\"modalDialog\">\r\n\t<div ng-show=\"!$ctrl._isDelete\">\r\n    <label ng-click=\"$ctrl.closeModal()\" title=\"Close\" class=\"close\">X</label>\r\n\t\t<div class=\"_component\">\r\n      <label>Username</label>\r\n      <input class=\"form-control\" type=\"text\" ng-model=\"$ctrl._account.username\">\r\n      <font style=\"color: red;\" ng-show=\"$ctrl.err.usr\"><i>Username is required</i></font>\r\n    </div>\r\n    \r\n    <div class=\"_component\"> \r\n      <label>Password</label>\r\n      <input class=\"form-control\" type=\"password\" ng-model=\"$ctrl._account.password\">\r\n      <font style=\"color: red;\" ng-show=\"$ctrl.err.pwd\"><i>Password is required</i></font>\r\n    </div>\r\n\r\n    <div class=\"_component\">\r\n      <label>Re-Password</label>\r\n      <input class=\"form-control\" type=\"password\" ng-model=\"$ctrl._account.repwd\">\r\n      <font style=\"color: red;\" ng-show=\"$ctrl.err.repwd\"><i>Password is not match</i></font>\r\n    </div>\r\n    \r\n    <div class=\"_component\">\r\n      <label> Active Status</label>\r\n      <span class=\"_noteField\" title=\"Sign-in Mode (Single = Only one user session exists at a time, Multiply = Multiply User sessions)\">? </span>\r\n       <select class=\"form-control\" style=\"height: 25px;\" ng-model=\"$ctrl._account.status\" ng-options=\"(item?'Activate':'Deactivate') for item in [1, 0]\"></select>\r\n       <font style=\"color: red;\" ng-show=\"$ctrl.err.stt\"><i>Status is required</i></font>\r\n    </div>\r\n\r\n    <div class=\"_component\">\r\n      <label> Role </label>\r\n      <select class=\"form-control\" style=\"padding-top: 5px;\" multiple ng-model=\"$ctrl._account.role_ids\" ng-options=\"item._id as item.name for item in $ctrl._roles\"></select>\r\n      <font style=\"color: red;\" ng-show=\"$ctrl.err.role\"><i>Role is required</i></font>\r\n    </div>\r\n\r\n    <div class=\"_component padding-bottom15\" style=\"margin-top: 20px;\">\r\n        <button class=\"padding-button5\" ng-click=\"$ctrl.create()\" ng-show=\"$ctrl._isCreate\">Create</button>\r\n        <button  class=\"padding-button5\" ng-click=\"$ctrl.save()\" ng-show=\"!$ctrl._isCreate\">Save</button>\r\n        <button  class=\"padding-button5\" ng-click=\"$ctrl.closeModal()\" >Cancel</button>\r\n    </div>\r\n\t</div>\r\n  <div ng-show=\"$ctrl._isDelete\">\r\n    <div class=\"_component\">\r\n      <label> Do you want to delete this account ? </label>\r\n    </div>\r\n    <div class=\"_component padding-bottom15\" style=\"margin-top: 20px;\">\r\n        <button class=\"padding-button5\" ng-click=\"$ctrl.delete()\">Delete</button>\r\n        <button class=\"padding-button5\" ng-click=\"$ctrl.closeModal()\" >Cancel</button>\r\n    </div>\r\n  </div>\r\n</dialog>";
+	module.exports = "  <table class=\"form full-width\">\r\n    <tr>\r\n      <td>\r\n        <button class=\"btn btn-default\" ng-click=\"$ctrl.showModal('add',{})\" >Add user</button>\r\n      </td>\r\n      <td>\r\n          <input class=\"form-control search\" placeholder=\"Enter keyword for searching\" type=\"text\" ng-model=\"$ctrl._kword\">\r\n      </td>\r\n    </tr>\r\n  </table>\r\n\r\n    <table class=\"table\">\r\n      <thead>\r\n      <tr>\r\n        <th class=\"non-number\">Username</th>\r\n        <th class=\"non-number\">Status</th>\r\n        <th class=\"non-number\">Role</th>\r\n        <th class=\"date\">Created date</th>\r\n        <th></th>\r\n      </tr>\r\n      </thead>\r\n      <tbody>\r\n      <tr ng-repeat=\"item in $ctrl._accounts | filter : $ctrl._kword\">\r\n        <td class=\"non-number\">{{item.username}}</td>\r\n        <td class=\"non-number\">{{item.status=='1'?'Activate':'Deactivate'}}</td>\r\n        <td class=\"non-number\">{{$ctrl.getID2LabelRole(item.role_ids)}}</td>\r\n        <td class=\"date\">{{item.created_at | date:'yyyy-MM-dd HH:mm'}}</td>\r\n        <td class=\"number\">\r\n          <label class=\"link\" ng-click=\"$ctrl.showModal('edit', item)\">Edit</label>\r\n          <label class=\"link\" ng-click=\"$ctrl.showModal('delete', item)\">Delete</label>\r\n        </td>\r\n      </tr>\r\n      </tbody>\r\n    </table>\r\n\r\n<dialog id=\"favDialog\" class=\"modalDialog form\">\r\n\t<div class=\"w20vw\" ng-show=\"!$ctrl._isDelete\">\r\n\t\t<div class=\"form-group\">\r\n      <label>Username</label>\r\n      <input class=\"form-control\" type=\"text\" ng-model=\"$ctrl._account.username\">\r\n      <font class=\"err\" ng-show=\"$ctrl.err.usr\">Username is required</font>\r\n    </div>\r\n    \r\n    <div class=\"form-group\"> \r\n      <label>Password</label>\r\n      <input class=\"form-control\" type=\"password\" ng-model=\"$ctrl._account.password\">\r\n      <font class=\"err\" ng-show=\"$ctrl.err.pwd\">Password is required</font>\r\n    </div>\r\n\r\n    <div class=\"form-group\">\r\n      <label>Re-Password</label>\r\n      <input class=\"form-control\" type=\"password\" ng-model=\"$ctrl._account.repwd\">\r\n      <font class=\"err\" ng-show=\"$ctrl.err.repwd\">Password is not match</font>\r\n    </div>\r\n    \r\n    <div class=\"form-group\">\r\n      <label> Active Status</label>\r\n      <span class=\"noteField\" title=\"Sign-in Mode (Single = Only one user session exists at a time, Multiply = Multiply User sessions)\">? </span>\r\n       <select class=\"form-control\" ng-model=\"$ctrl._account.status\" ng-options=\"(item?'Activate':'Deactivate') for item in [1, 0]\"></select>\r\n       <font class=\"err\" ng-show=\"$ctrl.err.stt\">Status is required</font>\r\n    </div>\r\n\r\n    <div class=\"form-group\">\r\n      <label> Role </label>\r\n      <select class=\"form-control select\" multiple ng-model=\"$ctrl._account.role_ids\" ng-options=\"item._id as item.name for item in $ctrl._roles\"></select>\r\n      <font class=\"err\" ng-show=\"$ctrl.err.role\">Role is required</font>\r\n    </div>\r\n\r\n    <div class=\"form-group\" >\r\n        <button class=\"btn btn-default\" ng-click=\"$ctrl.create()\" ng-show=\"$ctrl._isCreate\">Create</button>\r\n        <button  class=\"btn btn-default\" ng-click=\"$ctrl.save()\" ng-show=\"!$ctrl._isCreate\">Save</button>\r\n        <button  class=\"btn btn-default\" ng-click=\"$ctrl.closeModal()\" >Cancel</button>\r\n    </div>\r\n\t</div>\r\n  <div class=\"w20vw\" ng-show=\"$ctrl._isDelete\">\r\n    <div class=\"form-group\">\r\n      <label> Do you want to delete this account ? </label>\r\n    </div>\r\n    <div class=\"form-group\" style=\"margin-top: 20px;\">\r\n        <button class=\"btn btn-default\" ng-click=\"$ctrl.delete()\">Delete</button>\r\n        <button class=\"btn btn-default\" ng-click=\"$ctrl.closeModal()\" >Cancel</button>\r\n    </div>\r\n  </div>\r\n</dialog>\r\n";
 
 /***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(24);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(19)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!../../../node_modules/css-loader/index.js!../../../node_modules/sass-loader/index.js!./account.scss", function() {
-				var newContent = require("!!../../../node_modules/css-loader/index.js!../../../node_modules/sass-loader/index.js!./account.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(18)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "account ._table-layer {\n  width: 95%;\n  margin: 0 auto; }\n\naccount .clear {\n  clear: both; }\n\naccount ._component {\n  margin-top: 10px;\n  width: 100%; }\n\naccount label {\n  display: inline-block;\n  max-width: 100%;\n  margin-bottom: 5px;\n  font-weight: 700; }\n\naccount .form-control {\n  display: block;\n  font-size: 14px;\n  line-height: 1.42857143;\n  color: #555;\n  background-color: #fff;\n  background-image: none;\n  border: 1px solid #ccc;\n  border-radius: 4px;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);\n  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);\n  -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;\n  -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n  width: 98%;\n  padding-left: 5px; }\n\naccount ._noteField {\n  margin-left: 8px;\n  cursor: pointer;\n  text-decoration: underline;\n  font-weight: bolder; }\n\naccount .table {\n  width: 100%;\n  max-width: 100%;\n  border-collapse: collapse;\n  margin-bottom: 20px; }\n\naccount .table > thead:first-child > tr:first-child > th {\n  border-top: 0; }\n\naccount .table > thead > tr > th {\n  vertical-align: bottom;\n  border-bottom: 2px solid #ddd; }\n\naccount .table > thead > tr > th {\n  padding: 8px;\n  line-height: 1.42857143;\n  vertical-align: top;\n  border-top: 1px solid #ddd; }\n\naccount th {\n  text-align: left; }\n\naccount .table > tbody > tr > td,\naccount .table > tbody > tr > th,\naccount .table > tfoot > tr > td,\naccount .table > tfoot > tr > th,\naccount .table > thead > tr > td,\naccount .table > thead > tr > th {\n  padding: 8px;\n  line-height: 1.42857143;\n  vertical-align: top;\n  border-top: 1px solid #ddd; }\n\naccount ._link {\n  color: -webkit-link;\n  text-decoration: underline;\n  cursor: pointer;\n  font-weight: 100; }\n\naccount .padding-right5 {\n  padding-right: 5px; }\n\naccount .padding-button5 {\n  padding: 4px 11px; }\n\naccount .padding-bottom15 {\n  padding-bottom: 15px; }\n\naccount .modalDialog {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  background: rgba(0, 0, 0, 0.8);\n  z-index: 99999;\n  opacity: 1;\n  -webkit-transition: opacity 400ms ease-in;\n  -moz-transition: opacity 400ms ease-in;\n  transition: opacity 400ms ease-in;\n  width: 100%;\n  height: 100vh; }\n\naccount .modalDialog > div {\n  width: 400px;\n  position: relative;\n  margin: 10% auto;\n  padding: 5px 20px 13px 20px;\n  border-radius: 10px;\n  background: #fff;\n  background: -moz-linear-gradient(#fff, #999);\n  background: -webkit-linear-gradient(#fff, #DDD);\n  background: -o-linear-gradient(#fff, #999); }\n\naccount .close {\n  background: #606061;\n  color: #FFFFFF;\n  line-height: 25px;\n  position: absolute;\n  right: -12px;\n  text-align: center;\n  top: -10px;\n  width: 24px;\n  text-decoration: none;\n  font-weight: bold;\n  -webkit-border-radius: 12px;\n  -moz-border-radius: 12px;\n  border-radius: 12px;\n  -moz-box-shadow: 1px 1px 3px #000;\n  -webkit-box-shadow: 1px 1px 3px #000;\n  box-shadow: 1px 1px 3px #000; }\n\naccount .close:hover {\n  background: #00d9ff; }\n", ""]);
-
-	// exports
-
-
-/***/ },
+/* 23 */,
+/* 24 */,
 /* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -809,12 +778,16 @@ webpackJsonp([2],[
 	    controller: ['$config', '$location', '$window', 'Project', function ($config, $location, $window, Project) {
 	        __webpack_require__(27);
 	        var self = this;
-	        this.ourService = $config.services;
+	        this.ourService = {};
+	        for (var k in $config.services) {
+	            if (k === 'theme') continue;
+	            this.ourService[k] = $config.services[k];
+	        }
 	        this.loadConfig = function (key) {
 	            self.key = key;
 	            if (!self._project.plugins[key]) {
-	                Project.config(key).then(function (resp) {
-	                    self._project.plugins[key] = JSON.stringify(resp.data, null, '  ');
+	                Project.initConfig(key).then(function (resp) {
+	                    if (!resp || !resp.data) delete self._project.plugins[key];else self._project.plugins[key] = JSON.stringify(resp.data, null, '  ');
 	                });
 	            }
 	        };
@@ -848,6 +821,7 @@ webpackJsonp([2],[
 	            self._project = res.data instanceof Array ? res.data[0] : res.data;
 	            for (var k in self._project.plugins) {
 	                self._project.plugins[k] = JSON.stringify(self._project.plugins[k], null, '  ');
+	                if (k === 'oauth') self._project.plugins['oauth'] = self._project.plugins[k];
 	            }
 	        });
 	    }]
