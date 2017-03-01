@@ -90,114 +90,59 @@ exports = module.exports = {
 		return item;
 	},
 
-	async getCached(projectId, cached){
-		return await cached.get(`roles.${projectId}`);
+	async getCached(projectId){
+		return await cachedService.get(`roles.${projectId}`);
 	},
 
-	async refeshCached(projectId, cached, dbo, isRemove){
+	async refeshCached(projectId, isRemove){
 		if(isRemove){
-			await cached.del(`roles.${projectId}`);
+			await cachedService.del(`roles.${projectId}`);
 		}else {
-			const roles = await exports.find({
+			const roles = await db.find(exports.COLLECTION, {
 				$where: { project_id: projectId }
-			}, dbo);
-			if(roles.length > 0) await cached.set(`roles.${projectId}`, roles);
-			else await cached.del(`roles.${projectId}`);
-		}
-	},
-
-	async find(fil = {}, dbo) {
-		fil = exports.validate(fil, exports.VALIDATE.FIND);
-
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.find(fil, dbo.isnew ? db.DONE : db.FAIL);
-		return rs;
-	},
-
-	async get(_id, dbo) {
-		_id = exports.validate(_id, exports.VALIDATE.GET);
-
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.get(_id, dbo.isnew ? db.DONE : db.FAIL);
-		return rs;
-	},
-
-	async insert(item, dbo) {
-		item = exports.validate(item, exports.VALIDATE.INSERT);
-
-		let cached;
-		dbo = await db.open(exports.COLLECTION, dbo);		
-		try {
-			const rs = await dbo.insert(item);
-
-			cached = cachedService.open();
-			await exports.refeshCached(item.project_id, cached, dbo);
-
-			return rs;
-		} finally {
-			if(cached) await cached.close();
-			if(dbo.isnew) await dbo.close();
-		}
-	},
-
-	async update(item, dbo) {
-		item = exports.validate(item, exports.VALIDATE.UPDATE);
-
-		let cached;
-		dbo = await db.open(exports.COLLECTION, dbo);		
-		try {
-			const rs = await dbo.update(item);
-
-			cached = cachedService.open();
-			await exports.refeshCached(item._id.project_id, cached, dbo);
-			
-			return rs;
-		} finally {
-			if(cached) await cached.close();
-			if(dbo.isnew) await dbo.close();
-		}		
-
-		return rs;
-	},
-
-	async deleteAll(projectId, dbo) {
-		let cached;
-		dbo = await db.open(exports.COLLECTION, dbo);		
-		try {
-			const rs = await dbo.delete({
-				project_id: projectId
 			});
+			if(roles.length > 0) await cachedService.set(`roles.${projectId}`, roles);
+			else await cachedService.del(`roles.${projectId}`);
+		}
+	},
 
-			cached = cachedService.open();
-			await exports.refeshCached(projectId, cached, dbo, true);
-			
-			return rs;
-		} finally {
-			if(cached) await cached.close();
-			if(dbo.isnew) await dbo.close();
-		}		
+	async find(fil = {}) {
+		fil = exports.validate(fil, exports.VALIDATE.FIND);
+		return await db.find(exports.COLLECTION, fil);
+	},
 
+	async get(_id) {
+		_id = exports.validate(_id, exports.VALIDATE.GET);
+		return await db.get(exports.COLLECTION, _id);
+	},
+
+	async insert(item) {
+		item = exports.validate(item, exports.VALIDATE.INSERT);
+		const rs = await db.insert(exports.COLLECTION, item);
+		await exports.refeshCached(item.project_id);
 		return rs;
 	},
 
-	async delete(_id, dbo) {
+	async update(item) {
+		item = exports.validate(item, exports.VALIDATE.UPDATE);	
+		const rs = await db.update(exports.COLLECTION, item);
+		await exports.refeshCached(item._id.project_id);			
+		return rs;
+	},
+
+	async deleteAll(projectId) {
+		const rs = await db.delete(exports.COLLECTION, {
+			project_id: projectId
+		});
+		await exports.refeshCached(projectId, true);
+		return rs;
+	},
+
+	async delete(_id) {
 		_id = exports.validate(_id, exports.VALIDATE.DELETE);
-
-		let cached;
-		dbo = await db.open(exports.COLLECTION, dbo);		
-		try {
-			const item = await exports.get(_id, dbo);
-			const rs = await dbo.delete(_id);
-
-			cached = cachedService.open();
-			await exports.refeshCached(item.project_id, cached, dbo, true);
-			
-			return rs;
-		} finally {
-			if(cached) await cached.close();
-			if(dbo.isnew) await dbo.close();
-		}		
-
+		const item = await db.get(exports.COLLECTION, _id);
+		const rs = await db.delete(exports.COLLECTION, _id);
+		await exports.refeshCached(item.project_id, true);
 		return rs;
 	}
 

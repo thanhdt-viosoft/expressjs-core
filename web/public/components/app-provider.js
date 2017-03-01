@@ -1,102 +1,87 @@
 module.exports = {
-    Project: ['$http', '$rootScope', '$config', '$q', '$location', function($http, $rootScope, $config, $q,$location) {
+    UtilsService: ['$window', function($window) {
+        return {
+            throwError(err){
+                err.msg = err.msg || err.data;
+                $window.top.postMessage(JSON.stringify({type: 'ERROR', data: err}), '*');
+            }
+        }
+    }],
+    Project: ['$http', '$rootScope', '$config', '$window', '$location', 'UtilsService', function($http, $rootScope, $config, $window, $location, UtilsService) {
         return {
             config(key) {
-                return $http.post(`${$config.services[key]}/config`).then(function successCallback(response) {
-                    return response;
-                }, function errorCallback(response) {
-                    $location.path('/empty');
-                });
+                return $http.post(`${$config.services[key]}/config`).catch(UtilsService.throwError);
             },
             get: () => {
-                return $http.get(`${$config.apiUrl}/project`).then(function successCallback(response) {
-                    return response;
-                }, function errorCallback(response) {
-                    $location.path('/empty');
-                });
+                return $http.get(`${$config.services.oauth}/project`).catch(UtilsService.throwError);
             },
             add: (data) => {
-                return $http.post(`${$config.apiUrl}/project`, data).then(function successCallback(response) {
-                    return response;
-                }, function errorCallback(response) {
-                    $location.path('/empty');
-                });
+                return $http.post(`${$config.services.oauth}/project`, data).catch(UtilsService.throwError);
             },
             update: (data) => {
-                return $http.put(`${$config.apiUrl}/project`, data).then(function successCallback(response) {
-                    return response;
-                }, function errorCallback(response) {
-                    $location.path('/empty');
-                });
+                return $http.put(`${$config.services.oauth}/project`, data).catch(UtilsService.throwError);
             },
             getDetail(id) {
-                return $http.get(`${$config.apiUrl}/project/${id}`).then(function successCallback(response) {
-                    return response;
-                }, function errorCallback(response) {
-                    $location.path('/empty');
-                });
+                return $http.get(`${$config.services.oauth}/project/${id}`).catch(UtilsService.throwError);
             },
             delete(id) {
-                return $http.delete(`${$config.apiUrl}/project/${id}`).then(function successCallback(response) {
-                    return response;
-                }, function errorCallback(response) {
-                    $location.path('/empty');
-                });
+                return $http.delete(`${$config.services.oauth}/project/${id}`).catch(UtilsService.throwError);
             }
         };
     }],
-    Role: ['$http', '$rootScope', '$config', '$q', function($http, $rootScope, $config, $q) {
+    Role: ['$http', '$rootScope', '$config', 'UtilsService', function($http, $rootScope, $config, UtilsService) {
         return {
             get: () => {
-                return $http.get(`${$config.apiUrl}/role`);
+                return $http.get(`${$config.services.oauth}/role`).catch(UtilsService.throwError);
             },
             add: (data) => {
-                return $http.post(`${$config.apiUrl}/role`, data);
+                return $http.post(`${$config.services.oauth}/role`, data).catch(UtilsService.throwError);
             },
             update: (data) => {
-                return $http.put(`${$config.apiUrl}/role/${data._id}`, data);
+                return $http.put(`${$config.services.oauth}/role/${data._id}`, data).catch(UtilsService.throwError);
             },
             getDetail(id) {
-                return $http.get(`${$config.apiUrl}/role/${id}`);
+                return $http.get(`${$config.services.oauth}/role/${id}`).catch(UtilsService.throwError);
             },
             delete(id) {
-                return $http.delete(`${$config.apiUrl}/role/${id}`);
+                return $http.delete(`${$config.services.oauth}/role/${id}`).catch(UtilsService.throwError);
             }
         };
     }],
-    Account: ['$http', '$rootScope', '$config', '$q', function($http, $rootScope, $config, $q) {
+    Account: ['$http', '$rootScope', '$config', 'UtilsService', 'md5', function($http, $rootScope, $config, UtilsService, md5) {
         return {
             get: () => {
-                return $http.get(`${$config.apiUrl}/account`);
+                return $http.get(`${$config.services.oauth}/account`).catch(UtilsService.throwError);
             },
             login : (data, projectId) => {
-                return $http.post(`${$config.apiUrl}/login`, data, {headers : {pj: projectId}});
+                data = _.clone(data);
+                data.password = md5.createHash(data.password);
+                return $http.post(`${$config.services.oauth}/login`, data, {headers : {pj: projectId}}).catch(UtilsService.throwError);
+            },
+            logout(){
+                return $http.post(`${$config.services.oauth}/logout`).catch(UtilsService.throwError);
             },
             add: (data) => {
-                // return $http.post(`${$config.apiUrl}/register`, data);
-                return $http.post(`${$config.apiUrl}/account`, data);
+                data = _.clone(data);
+                data.password = md5.createHash(data.password);
+                return $http.post(`${$config.services.oauth}/account`, data).catch(UtilsService.throwError);
             },
             author: (data) => {
-                // data.pj = $config.auth.pj;
-                // headers : {
-                //     'content-type': 'application/json',
-                //     'token': '58997ac77e9a4435508973bf-589980092d24aa1dbc5f97ea-589bd9aafb9ca430b415ee7f',
-                //     'path': '/Login',
-                //     'actions': 'ADD'
-                // }
-                return $http.head(`${$config.apiUrl}/authoriz`, {headers : data});
+                return $http.head(`${$config.services.oauth}/authoriz`, {headers : data}).catch(UtilsService.throwError);
             },
             ping: (data) => {
-                return $http.head(`${$config.apiUrl}/ping`);
+                return $http.head(`${$config.services.oauth}/ping`).catch(UtilsService.throwError);
             },
             update: (account) => {
-                return $http.put(`${$config.apiUrl}/account/${account._id}`, account);
+                if(account.password) account = _.clone(account);
+                account.password = md5.createHash(account.password);
+                return $http.put(`${$config.services.oauth}/account/${account._id}`, account).catch(UtilsService.throwError);
             },
             getDetail(id) {
-                return $http.get(`${$config.apiUrl}/account/${id}`);
+                return $http.get(`${$config.services.oauth}/account/${id}`).catch(UtilsService.throwError);
             },
             delete(id) {
-                return $http.delete(`${$config.apiUrl}/account/${id}`);
+                return $http.delete(`${$config.services.oauth}/account/${id}`).catch(UtilsService.throwError);
             }
         };
     }]

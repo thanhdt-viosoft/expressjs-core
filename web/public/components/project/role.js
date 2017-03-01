@@ -20,10 +20,6 @@ module.exports = {
                     self._roles[i].web = this.arrInOneLine(self._roles[i].web);
                     self._roles[i].mob = this.arrInOneLine(self._roles[i].mob);
                 }      
-            }).catch((err) => {
-                setTimeout(function() {
-                    document.querySelector('#btnApply').click();    
-                });
             }); 
         }
         
@@ -134,10 +130,6 @@ module.exports = {
             }
             return arr;
         };
-
-        this.sendRedirect = () => {
-            $location.path('/');
-        }
 
         this.arrInOneLine = (_obj) => {
             if(!_obj || _obj.length == 0) 

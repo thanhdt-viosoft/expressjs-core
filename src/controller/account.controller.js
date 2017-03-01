@@ -16,10 +16,17 @@ app.get('/account', utils.auth(`${global.appconfig.name}>account`, 'FIND'), asyn
 	try {
 		let where = req.query.q ? JSON.parse(req.query.q) : {};
 		where.project_id = req.auth.projectId;
+		where._id = { $ne: req.auth.accountId };
+		where.is_nature = { $eq: null };
 		const rs = await accountService.find({
 			$where: where,
 			$sort: {
 				updated_at: -1
+			},
+			$fields: {
+				password: 0,
+				status: 0,
+				app: 0
 			}
 		});
 		res.send(rs);
@@ -31,8 +38,15 @@ app.get('/account', utils.auth(`${global.appconfig.name}>account`, 'FIND'), asyn
 app.get('/account/:_id', utils.auth(`${global.appconfig.name}>account`, 'GET'), async(req, res, next) => {
 	try {
 		const rs = await accountService.get({
-			_id: db.uuid(req.params._id),
-			project_id: req.auth.projectId
+			$where: {
+				_id: db.uuid(req.params._id),
+				project_id: req.auth.projectId
+			},
+			$fields: {
+				password: 0,
+				status: 0,
+				app: 0
+			}
 		});
 		res.send(rs);
 	} catch (err) {
@@ -53,7 +67,7 @@ app.post('/account', utils.auth(`${global.appconfig.name}>account`, 'ADD'), body
 }), async(req, res, next) => {
 	try {
 		req.body.project_id = req.auth.projectId;
-		const rs = await accountService.insert(req.body);
+		const rs = await accountService.insert(req.body, req.auth);
 		res.send(rs);
 	} catch (err) {
 		next(err);

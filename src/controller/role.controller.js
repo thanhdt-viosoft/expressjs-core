@@ -15,6 +15,7 @@ app.get('/role', utils.auth(`${global.appconfig.name}>role`, 'FIND'), async(req,
 	try {
 		let where = {};
 		where.project_id = req.auth.projectId;
+		where.is_nature = { $eq: null };
 		const rs = await roleService.find({
 			$where: where
 		});

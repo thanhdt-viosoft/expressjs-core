@@ -27,6 +27,12 @@ app.get('/project', utils.auth(`${global.appconfig.name}>project`, 'FIND'), asyn
 					updated_at: -1
 				}
 			});
+			let idx = rs.findIndex((e) => {
+				return e._id.toString() === req.auth.projectId.toString();
+			});
+			let tmp = rs[0];
+			rs[0] = rs[idx];
+			rs[idx] = tmp;
 			res.send(rs);
 		}
 	} catch (err) {

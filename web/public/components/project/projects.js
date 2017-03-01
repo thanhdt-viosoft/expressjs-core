@@ -1,7 +1,7 @@
 module.exports = {
     name: 'projects',
     template: require('./projects.html'),
-    controller: ['$config', 'Project', '$location', function ($config, Project, $location) {
+    controller: ['$config', 'Project', '$location', 'UtilsService', function ($config, Project, $location, UtilsService) {
         require('./projects.scss');
 
         let self = this;
@@ -9,11 +9,8 @@ module.exports = {
         self.err = {};
         this.$routerOnActivate = (next) => {
             Project.get().then((res)=> {
-                if(res.data.constructor === Array) self._projects = res.data;
-            }).catch((err) => {
-                setTimeout(function() {
-                    document.querySelector('#btnApply').click();    
-                });
+                if(res.data instanceof Array) self._projects = res.data;
+                UtilsService.throwError({currentProject: res.data});
             });
         } 
         this.create = () => {
@@ -27,7 +24,6 @@ module.exports = {
                 if(!self._projects) {
                     self._projects = [];
                 }
-                console.log(res.data);
                 self._projects.splice(0, 0, res.data);
                 this.closeModal();
             });
@@ -57,9 +53,7 @@ module.exports = {
             self._project = (!item ? {}:item);
             document.getElementById('favDialog').showModal();
         };
-        this.sendRedirect = () => {
-            $location.path('/');
-        };
+
         this.closeModal = () => {
             self._isDelete = "";
             self._isCreate = "";
