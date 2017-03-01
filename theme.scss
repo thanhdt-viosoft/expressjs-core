@@ -38,22 +38,9 @@ a {
     color: $primary;
 }
 
-/* Tab */
-.tab {
-    border-collapse: collapse;
-    li.active {
-        background-color: $light1;
-    }
-    li {
-        display: inline;
-        padding: 8px 16px;
-        border: solid 1px $dark-2;
-        cursor: pointer;
-    }
-}
 
+@import "./components/tab.scss";
 @import "./components/table.scss";
 @import "./components/dialog.scss";
 @import "./components/detail.scss";
 @import "./components/form.scss";
-@import "./components/account.scss";

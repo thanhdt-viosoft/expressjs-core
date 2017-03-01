@@ -27,7 +27,9 @@ window.location.query = (function(a) {
 })(window.location.search.substr(1).split('&'));
 
 window.onmessage = function(e){
-    let res = JSON.parse(e.data);
+    let data = JSON.parse(e.data);
+    if(data.type !== 'ERROR') return;
+    let res = data.data;
     if(res.status !== 200) {           
         if(res.status === Error.EXPIRED) {
             delete window.localStorage.token;

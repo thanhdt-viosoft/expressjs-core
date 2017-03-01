@@ -1,21 +1,17 @@
 <html>
     <head>
         <script type="text/javascript" src="./main.js"></script>
-        <style type="text/css">
-            body {
-                padding: 0px;
-                margin: 0px;
-            }
-            #projectInfo {
-                padding: 10px;
-            }
-        </style>
+        <link rel="stylesheet" href="./theme.css" />        
     </head>
-    <body>
-        <h1 id="projectInfo"></h1>
-        <a href="javascript:void(0);" onclick="logout()">Logout</a>
+    <body class="page-manager">
+        <div>
+            <a style="float: right" href="javascript:void(0);" onclick="logout()">Logout!</a>
+            <h3 id="projectInfo"></h3>            
+        </div>
         <ul id="actions" class="tab"></ul>
-        <iframe src="" id="mainFrame" name="mainFrame" width="100%" style="height: 80vh" frameborder="0" scrolling="no"></iframe>
+        <div style="padding: 8px">
+            <iframe src="" id="mainFrame" name="mainFrame" width="100%" style="height: 80vh" frameborder="0" scrolling="no"></iframe>
+        </div>
     </body>
     <script type="text/javascript" src="./dashboard.js"></script>
 </html>

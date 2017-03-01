@@ -9,4 +9,7 @@ window.handlerError = (res) => {
         alert(res.msg);
     }
 }
-login.src=`${window.config.plugins.login.link}?id=${location.query.id}&theme=${window.location.query.theme || window.config.theme}`;         
+login.addEventListener('load', () => {
+    login.contentWindow.postMessage(JSON.stringify({type: 'INIT', data: window.config.services}), '*');
+});
+login.src=`${window.config.plugins.login.link}?id=${location.query.id}&theme=${window.location.query.theme || window.config.theme}&output=embed`;         
