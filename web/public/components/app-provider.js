@@ -10,13 +10,13 @@ module.exports = {
     Mail: ['$http', '$rootScope', '$config', 'UtilsService', function ($http, $rootScope, $config, UtilsService) {
         return {
             find(status) {
-                return $http.get(`${$config.apiUrl}/mail?status=${status}`).catch(UtilsService.throwError);
+                return $http.get(`${$config.services.mail}/mail?status=${status}`).catch(UtilsService.throwError);
             },
             init() {
-                return $http.post(`${$config.apiUrl}/config`).catch(UtilsService.throwError);
+                return $http.post(`${$config.services.mail}/config`).catch(UtilsService.throwError);
             },
             delete(_id) {                
-                return $http.delete(`${$config.apiUrl}/mail/${_id}`).catch(UtilsService.throwError);
+                return $http.delete(`${$config.services.mail}/mail/${_id}`).catch(UtilsService.throwError);
             }   
         }
     }]

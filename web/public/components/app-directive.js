@@ -62,9 +62,9 @@ module.exports = {
               if (scope.size) {
                 var ii = backgroundSrc.lastIndexOf('/');
                 backgroundSrc = backgroundSrc.substr(0, ii + 1) + scope.size + backgroundSrc.substr(ii);
-                element[i].style.backgroundImage = 'url(' + $config.apiUrl + backgroundSrc + '), url(' + require('../assets/images/no-photo.png') + ')';
+                element[i].style.backgroundImage = 'url(' + $config.services.mail + backgroundSrc + '), url(' + require('../assets/images/no-photo.png') + ')';
               } else {
-                element[i].style.backgroundImage = 'url(' + $config.apiUrl + backgroundSrc + ')';
+                element[i].style.backgroundImage = 'url(' + $config.services.mail + backgroundSrc + ')';
               }
             } else {
               element[i].style.backgroundImage += 'url(' + require('../assets/images/no-photo.png') + ')';
@@ -95,8 +95,8 @@ module.exports = {
                 var ii = imageSrc.lastIndexOf('/');
                 imageSrc = imageSrc.substr(0, ii + 1) + scope.size + imageSrc.substr(ii);
               }
-              console.log($config.apiUrl + imageSrc);
-              ee.setAttribute('src', $config.apiUrl + imageSrc);
+              console.log($config.services.mail + imageSrc);
+              ee.setAttribute('src', $config.services.mail + imageSrc);
             }
           } else {
             ee.setAttribute('src', require('../assets/images/no-photo.png'));

@@ -113,9 +113,9 @@ webpackJsonp([2],[
 	              if (scope.size) {
 	                var ii = backgroundSrc.lastIndexOf('/');
 	                backgroundSrc = backgroundSrc.substr(0, ii + 1) + scope.size + backgroundSrc.substr(ii);
-	                element[i].style.backgroundImage = 'url(' + $config.apiUrl + backgroundSrc + '), url(' + __webpack_require__(9) + ')';
+	                element[i].style.backgroundImage = 'url(' + $config.services.mail + backgroundSrc + '), url(' + __webpack_require__(9) + ')';
 	              } else {
-	                element[i].style.backgroundImage = 'url(' + $config.apiUrl + backgroundSrc + ')';
+	                element[i].style.backgroundImage = 'url(' + $config.services.mail + backgroundSrc + ')';
 	              }
 	            } else {
 	              element[i].style.backgroundImage += 'url(' + __webpack_require__(9) + ')';
@@ -146,8 +146,8 @@ webpackJsonp([2],[
 	                var ii = imageSrc.lastIndexOf('/');
 	                imageSrc = imageSrc.substr(0, ii + 1) + scope.size + imageSrc.substr(ii);
 	              }
-	              console.log($config.apiUrl + imageSrc);
-	              ee.setAttribute('src', $config.apiUrl + imageSrc);
+	              console.log($config.services.mail + imageSrc);
+	              ee.setAttribute('src', $config.services.mail + imageSrc);
 	            }
 	          } else {
 	            ee.setAttribute('src', __webpack_require__(9));
@@ -200,13 +200,13 @@ webpackJsonp([2],[
 	    Mail: ['$http', '$rootScope', '$config', 'UtilsService', function ($http, $rootScope, $config, UtilsService) {
 	        return {
 	            find: function find(status) {
-	                return $http.get($config.apiUrl + '/mail?status=' + status).catch(UtilsService.throwError);
+	                return $http.get($config.services.mail + '/mail?status=' + status).catch(UtilsService.throwError);
 	            },
 	            init: function init() {
-	                return $http.post($config.apiUrl + '/config').catch(UtilsService.throwError);
+	                return $http.post($config.services.mail + '/config').catch(UtilsService.throwError);
 	            },
 	            delete: function _delete(_id) {
-	                return $http.delete($config.apiUrl + '/mail/' + _id).catch(UtilsService.throwError);
+	                return $http.delete($config.services.mail + '/mail/' + _id).catch(UtilsService.throwError);
 	            }
 	        };
 	    }]
