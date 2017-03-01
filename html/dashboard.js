@@ -1,10 +1,14 @@
 let actions = document.querySelector('#actions');
 let token = window.localStorage.token;
 let theme = window.localStorage.theme;
-document.querySelector('#mainFrame').setAttribute('src', `${window.config.plugins.project.link}?session=${token}&theme=${theme}&output=embed`);
+let mainFrame = document.querySelector('#mainFrame');
+mainFrame.setAttribute('src', `${window.config.plugins.project.link}?session=${token}&theme=${theme}&output=embed`);
 window.logout = () => {
-    document.querySelector('#mainFrame').setAttribute('src', `${window.config.plugins.logout.link}?session=${token}&theme=${theme}&output=embed`);
+    mainFrame.setAttribute('src', `${window.config.plugins.logout.link}?session=${token}&theme=${theme}&output=embed`);
 };
+mainFrame.addEventListener('load', () => {
+    mainFrame.contentWindow.postMessage(JSON.stringify({type: 'INIT', data: window.config.services}), '*');
+});
 window.handlerError = (res) => {
     if(res.error) {
         alert(res.error);
