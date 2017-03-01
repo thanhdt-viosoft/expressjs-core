@@ -14,22 +14,22 @@ exports = module.exports = {
         })        
     },
     async updateConfig(auth, data) {
-        const resp = await httpService.put(`${global.appconfig.auth.url}/project-config`, {
+        const resp = await httpService.put(`${global.appconfig.auth.url}/config`, {
             headers: {
                 token: auth.rawToken,
-                path: '/project-config',
-                actions: 'UPDATE_CONFIG'
+                path: '/config',
+                actions: 'UPDATE'
             },
             data: data
         });
-        return resp;
+        return resp.body;
     },
     async getConfig(auth, pluginName) {
-        const resp = await httpService.get(`${global.appconfig.auth.url}/project-config`, {
+        const resp = await httpService.get(`${global.appconfig.auth.url}/config`, {
             headers: {
                 token: auth.rawToken,
-                path: '/project-config',
-                actions: 'GET_CONFIG'
+                path: '/config',
+                actions: 'GET'
             },
             query: {
                 plugin: pluginName

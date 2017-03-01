@@ -2,22 +2,31 @@ module.exports = {
     UtilsService: ['$window', function($window) {
         return {
             throwError(err){
-                console.log('e');
-                $window.top.postMessage(JSON.stringify(err), '*');
+                err.msg = err.msg || err.data;
+                $window.top.postMessage(JSON.stringify({type: 'ERROR', data: err}), '*');
             }
         }
     }],
-    Mail: ['$http', '$rootScope', '$config', 'UtilsService', function ($http, $rootScope, $config, UtilsService) {
+    Project: ['$http', '$rootScope', '$config', '$window', '$location', 'UtilsService', function($http, $rootScope, $config, $window, $location, UtilsService) {
         return {
-            find(status) {
-                return $http.get(`${$config.apiUrl}/mail?status=${status}`).catch(UtilsService.throwError);
+            config(key) {
+                return $http.post(`${$config.services[key]}/config`).catch(UtilsService.throwError);
             },
-            init() {
-                return $http.post(`${$config.apiUrl}/config`).catch(UtilsService.throwError);
+            get: () => {
+                return $http.get(`${$config.services.oauth}/project`).catch(UtilsService.throwError);
             },
-            delete(_id) {                
-                return $http.delete(`${$config.apiUrl}/mail/${_id}`).catch(UtilsService.throwError);
-            }   
+            add: (data) => {
+                return $http.post(`${$config.services.oauth}/project`, data).catch(UtilsService.throwError);
+            },
+            update: (data) => {
+                return $http.put(`${$config.services.oauth}/project`, data).catch(UtilsService.throwError);
+            },
+            getDetail(id) {
+                return $http.get(`${$config.services.oauth}/project/${id}`).catch(UtilsService.throwError);
+            },
+            delete(id) {
+                return $http.delete(`${$config.services.oauth}/project/${id}`).catch(UtilsService.throwError);
+            }
         };
     }]
 }
