@@ -31,7 +31,7 @@ exports = module.exports = {
 				checker.option('des', item.name, String);
 				item.status = checker.must('status', item.status, Number, 0);
 				item.plugins = {
-					oauthv2: {
+					oauth: {
 						single_mode: true,
 						session_expired: 15*60,
 						is_verify: true
@@ -47,10 +47,10 @@ exports = module.exports = {
 				checker.option('des', item.name, String);
 				checker.option('status', item.status, Number);
 				checker.option('plugins', item.plugins, Object, (plugins) => {
-					checker.option('oauthv2', item.plugins.oauthv2, Object, (oauthv2) => {
-						checker.must('single_mode', item.plugins.oauthv2.single_mode, Boolean);						
-						checker.must('session_expired', item.plugins.oauthv2.session_expired, Number);	
-						checker.must('is_verify', item.plugins.oauthv2.single_mode, Boolean);
+					checker.option('oauth', item.plugins.oauth, Object, (oauth) => {
+						checker.must('single_mode', item.plugins.oauth.single_mode, Boolean);						
+						checker.must('session_expired', item.plugins.oauth.session_expired, Number);	
+						checker.must('is_verify', item.plugins.oauth.single_mode, Boolean);
 					});					
 					checker.option('mail', item.plugins.mail, Object);
 				});				
@@ -82,8 +82,8 @@ exports = module.exports = {
 		if(plugin) return rs.plugins[plugin];
 		return rs;
 	},
-	
-	async initConfig(_id, config) {
+
+	async updateConfig(_id, config) {
 		config = exports.validate(config, exports.VALIDATE.UPDATE_CONFIG);
 		const oldItem = await db.get(exports.COLLECTION, {
 			$where: {
@@ -94,7 +94,7 @@ exports = module.exports = {
 				plugins: 1
 			}
 		});
-		oldItem.plugins = _.merge({}, config, oldItem.plugins);
+		oldItem.plugins = _.merge({}, oldItem.plugins, config);
 		const rs = await db.update(exports.COLLECTION, oldItem);
 		return rs;
 	},

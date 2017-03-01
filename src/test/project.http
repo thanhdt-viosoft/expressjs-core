@@ -10,7 +10,7 @@
 		name: 'Thanh 1 PRoject',
 		status: 1,
 		plugins: {
-			oauthv2: {
+			oauth: {
 				single_mode: true,
 				session_expired: 1800
 			}
@@ -36,7 +36,7 @@
 	},
 	requestBody: {
 		plugins: {
-				"oauthv2": {
+				"oauth": {
 				"single_mode": false,
 				"session_expired": 6000
 			},

@@ -133,11 +133,11 @@ exports = module.exports = {
 		delete user.api;
 		const projectService = require('./project.service');
 		const project = await projectService.getCached(user.project_id);			
-		if(!project.plugins.oauthv2) throw Error.create(Error.INTERNAL, 'Oauthv2 plugin not config yet');
-		if(project.plugins.oauthv2.single_mode === true) await cachedService.del(`login.${user.token}`);
+		if(!project.plugins.oauth) throw Error.create(Error.INTERNAL, 'oauth plugin not config yet');
+		if(project.plugins.oauth.single_mode === true) await cachedService.del(`login.${user.token}`);
 		user.token = db.uuid();
 		await db.update(exports.COLLECTION, user);
-		await cachedService.set(`login.${user.token}`, user, project.plugins.oauthv2.session_expired);
+		await cachedService.set(`login.${user.token}`, user, project.plugins.oauth.session_expired);
 		return `${user.project_id}-${user._id}-${user.token}`;
 	},
 
@@ -177,7 +177,7 @@ exports = module.exports = {
 		if(!user) throw Error.create(Error.EXPIRED, 'Session was expired');
 		const projectService = require('./project.service');
 		const project = await projectService.getCached(user.project_id);
-		await cachedService.touch(`login.${auth.secretToken}`, project.plugins.oauthv2.session_expired);
+		await cachedService.touch(`login.${auth.secretToken}`, project.plugins.oauth.session_expired);
 	},
 
 	async find(fil = {}) {
@@ -219,7 +219,7 @@ exports = module.exports = {
 				to: [item.recover_by]
 			}, auth);
 		}else {
-			item.status = project.plugins.oauthv2.is_verify === true ? exports.STATUS.ACTIVE : exports.STATUS.INACTIVE;
+			item.status = project.plugins.oauth.is_verify === true ? exports.STATUS.ACTIVE : exports.STATUS.INACTIVE;
 		}
 		delete item.password0;
 		return await db.insert(exports.COLLECTION, item);

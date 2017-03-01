@@ -51,7 +51,7 @@ app.get('/project/:_id', utils.auth(`${global.appconfig.name}>project`, 'GET'), 
 	}
 });
 
-app.get('/project-config', utils.auth(`${global.appconfig.name}>project`, 'GET_CONFIG'), async(req, res, next) => {
+app.get('/config', utils.auth(`${global.appconfig.name}>project`, 'GET_CONFIG'), async(req, res, next) => {
 	try {
 		const rs = await projectService.getConfig(req.auth.projectId, req.query.plugin);
 		res.send(rs);
@@ -60,9 +60,9 @@ app.get('/project-config', utils.auth(`${global.appconfig.name}>project`, 'GET_C
 	}
 });
 
-app.put('/project-config', utils.auth(`${global.appconfig.name}>project`, 'UPDATE_CONFIG'), bodyHandler.jsonHandler(), async(req, res, next) => {
+app.put('/config', utils.auth(`${global.appconfig.name}>project`, 'UPDATE_CONFIG'), bodyHandler.jsonHandler(), async(req, res, next) => {
 	try {
-		const rs = await projectService.initConfig(req.auth.projectId, req.body);
+		const rs = await projectService.updateConfig(req.auth.projectId, req.body);
 		res.send(req.body);
 	} catch (err) {
 		next(err);

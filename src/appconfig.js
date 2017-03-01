@@ -1,5 +1,5 @@
 global.appconfig = {
-    name: 'plugin.oauthv2',
+    name: 'plugin.oauth',
     listen: 9600,
     db: {
         url: 'mongodb://192.168.0.111:27017/oauthv2'
