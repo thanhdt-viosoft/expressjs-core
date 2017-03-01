@@ -1,10 +1,11 @@
 {
-  "name": "expressjs-core-merge",
+  "name": "mcro-theme",
   "version": "1.0.0",
-  "description": "",
+  "description": "Publish theme and admin manager for GUI",
   "main": "index.js",
   "scripts": {
     "start": "node index",
+    "pm2": "pm2 start pm2.config.js",
     "dev": "webpack --progress --colors --watch",
     "theme": "sass --watch ./theme.scss:./dist/theme.css --style compressed",
     "package": "webpack --progress --colors & sass ./theme.scss:./dist/theme.css --style compressed"
