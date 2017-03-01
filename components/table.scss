@@ -5,6 +5,10 @@
     border-collapse: collapse;
     box-shadow: 0px 1px 1px $dark-2;
 
+    .non-number {
+        text-align: left;
+    }
+
     .number {
         text-align: right;
     }

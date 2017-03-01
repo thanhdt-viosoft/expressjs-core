@@ -20,7 +20,8 @@ $fontL: 14px;
 /* Common */
 
 body {
-    
+    margin: 0px;
+    padding: 0px;
 }
 
 .error {
@@ -53,3 +54,6 @@ a {
 
 @import "./components/table.scss";
 @import "./components/dialog.scss";
+@import "./components/detail.scss";
+@import "./components/form.scss";
+@import "./components/account.scss";
