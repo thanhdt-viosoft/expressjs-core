@@ -1,37 +1,31 @@
 module.exports = {    
-    Cuisine: ['$http', '$rootScope', '$config', '$q', function ($http, $rootScope, $config, $q) {
+    UtilsService: ['$window', function($window) {
         return {
-            findById: (id) => {
-                var cuisine = null;
-                $rootScope.cuisines.forEach(item => {
-                    if (item.id == id)
-                        cuisine = item;
-                });
-                return cuisine;
+            throwError(err){
+                err.msg = err.msg || err.data;
+                $window.top.postMessage(JSON.stringify({type: 'ERROR', data: err}), '*');
+            }
+        }
+    }],
+    Project: ['$http', '$rootScope', '$config', '$window', '$location', 'UtilsService', function($http, $rootScope, $config, $window, $location, UtilsService) {
+        return {
+            config(key) {
+                return $http.post(`${$config.services[key]}/config`).catch(UtilsService.throwError);
             },
-            search: (name) => {
-                var deferred = $q.defer();
-                var rs = [];
-                name = name.toLowerCase();
-                for (var item of $rootScope.cuisines) {
-                    if (item.name.toLowerCase().indexOf(name) != -1 || item.des.toLowerCase().indexOf(name) != -1)
-                        rs.push(item);
-                }
-                setTimeout(() => {
-                    deferred.resolve({
-                        data: rs
-                    });
-                }, 500);
-                return deferred.promise;
+            get: () => {
+                return $http.get(`${$config.services.oauth}/project`).catch(UtilsService.throwError);
             },
-            find: () => {
-                // Used in new version
-                return $http.get(`${$config.apiUrl}/whatseat/cuisine`);
+            add: (data) => {
+                return $http.post(`${$config.services.oauth}/project`, data).catch(UtilsService.throwError);
             },
-            load: () => {
-                $http.get(`${$config.apiUrl}/whatseat/cuisine`).then((res) => {
-                    $rootScope.cuisines = res.data;
-                });
+            update: (data) => {
+                return $http.put(`${$config.services.oauth}/project`, data).catch(UtilsService.throwError);
+            },
+            getDetail(id) {
+                return $http.get(`${$config.services.oauth}/project/${id}`).catch(UtilsService.throwError);
+            },
+            delete(id) {
+                return $http.delete(`${$config.services.oauth}/project/${id}`).catch(UtilsService.throwError);
             }
         };
     }]
