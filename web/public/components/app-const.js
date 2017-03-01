@@ -1,3 +1,3 @@
 module.exports = {
-    apiUrl: 'http://localhost:9602'
+    // never use services in there
 }

@@ -2,8 +2,8 @@ module.exports = {
     UtilsService: ['$window', function($window) {
         return {
             throwError(err){
-                console.log('e');
-                $window.top.postMessage(JSON.stringify(err), '*');
+                err.msg = err.msg || err.data;
+                $window.top.postMessage(JSON.stringify({type: 'ERROR', data: err}), '*');
             }
         }
     }],
@@ -18,6 +18,6 @@ module.exports = {
             delete(_id) {                
                 return $http.delete(`${$config.apiUrl}/mail/${_id}`).catch(UtilsService.throwError);
             }   
-        };
+        }
     }]
 }
