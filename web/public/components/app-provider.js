@@ -9,8 +9,11 @@ module.exports = {
     }],
     Project: ['$http', '$rootScope', '$config', '$window', '$location', 'UtilsService', function($http, $rootScope, $config, $window, $location, UtilsService) {
         return {
-            config(key) {
+            initConfig(key) {
                 return $http.post(`${$config.services[key]}/config`).catch(UtilsService.throwError);
+            },
+            updateConfig: (data) => {
+                return $http.put(`${$config.services.oauth}/config`, data).catch(UtilsService.throwError);
             },
             get: () => {
                 return $http.get(`${$config.services.oauth}/project`).catch(UtilsService.throwError);

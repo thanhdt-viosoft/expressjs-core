@@ -4,12 +4,17 @@ module.exports = {
     controller: ['$config', '$location', '$window', 'Project', function ($config, $location, $window, Project) {
         require('./config.scss');
         let self = this;
-        this.ourService = $config.services; 
+        this.ourService = {};
+        for(let k in $config.services){
+            if(k === 'theme') continue;
+            this.ourService[k] = $config.services[k];
+        }
         this.loadConfig = (key) => {
             self.key = key;
             if(!self._project.plugins[key]) {
-                Project.config(key).then((resp) => {
-                    self._project.plugins[key] = JSON.stringify(resp.data, null, '  ');
+                Project.initConfig(key).then((resp) => {
+                    if(!resp || !resp.data) delete self._project.plugins[key];
+                    else self._project.plugins[key] = JSON.stringify(resp.data, null, '  ');
                 });
             }
         }
@@ -41,8 +46,9 @@ module.exports = {
 
         Project.get().then((res) => {
             self._project = res.data instanceof Array ? res.data[0] : res.data;
-            for(var k in self._project.plugins) {
+            for(var k in self._project.plugins) {                
                 self._project.plugins[k] = JSON.stringify(self._project.plugins[k], null, '  ');
+                if(k==='oauth') self._project.plugins['oauth'] = self._project.plugins[k];
             }            
         });
     }]

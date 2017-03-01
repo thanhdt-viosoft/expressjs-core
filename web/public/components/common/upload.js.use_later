@@ -21,7 +21,7 @@ module.exports = {
         var i = this.itemSrc.lastIndexOf('/');
         this.itemSrc = this.itemSrc.substr(0, i+1) + this.size + this.itemSrc.substr(i);
     }
-    this.apiUrl = (this.itemSrc && this.itemSrc.indexOf('http')!==0) ? $config.apiUrl : '';
+    this.apiUrl = (this.itemSrc && this.itemSrc.indexOf('http')!==0) ? $config.services.oauth : '';
     this.pattern = this.pattern || 'image/*';  
     this.upload = function (file) {
       if(file === null) return null;
