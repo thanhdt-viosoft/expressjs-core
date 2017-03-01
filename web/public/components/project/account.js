@@ -2,7 +2,7 @@ module.exports = {
     name: 'account',
     template: require('./account.html'),
     controller: ['$config', 'Role', 'Account', '$location', function ($config, Role, Account, $location) {
-        require('./account.scss');
+        // require('./account.scss');
 
         let self = this;
         self._account = {};
