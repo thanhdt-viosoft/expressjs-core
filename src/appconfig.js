@@ -1,5 +1,5 @@
 global.appconfig = {
-    listen: 9601,
+    listen: 9603,
     name: 'plugin.log',
     db: {
         url: 'mongodb://localhost:27017/log'
