@@ -1,5 +1,6 @@
 var path = require('path');
 var webpack = require('webpack');
+var OptimizeJsPlugin = require("optimize-js-plugin");
 
 module.exports = {
     entry: {
@@ -11,8 +12,9 @@ module.exports = {
         comments: false
     },
     module: {
-        loaders: [
+        loaders: [            
             { test: /\.s?css$/, loader: 'style!css!sass'},
+            { test: require.resolve('angular'), loader: 'exports?window.angular' },
             {
                 test: /\.js$/,
                 exclude: /(node_modules|bower_components)/,
@@ -27,7 +29,17 @@ module.exports = {
             { test: /\.htm$/, loaders: ['file-loader?name=[name].[ext]', 'extract-loader', 'html-loader?minimize=true'] }
         ]
     },
+    resolve: {
+        modulesDirectories: ['node_modules'],
+        alias: {
+            angular: "angular/index.js",
+            router:  "@angular/router/angular1/angular_1_router.js"
+        }
+    },
     plugins: [
+        new webpack.ProvidePlugin({
+            "angular": "angular"
+        }),
         new webpack.DefinePlugin({
             'process.env': {
                 'NODE_ENV': JSON.stringify('production')
@@ -38,6 +50,9 @@ module.exports = {
         new webpack.optimize.UglifyJsPlugin({
             compress: { warnings: false },
             comments: false,
+            sourceMap: false
+        }),
+        new OptimizeJsPlugin({
             sourceMap: false
         }),
         new webpack.optimize.LimitChunkCountPlugin({maxChunks: 15}),
