@@ -41,7 +41,8 @@
         <td>{{item.config_name}}</td>
         <td class="date">{{item.updated_at | date:'yyyy-MM-dd HH:mm'}}</td>
         <th>
-            <a href="javascript: void(0);" open-modal="#formDetails" ng-click="$ctrl.details(item)">Details</a>
+            <a href="javascript: void(0);" open-modal="#formDetails" ng-click="$ctrl.details(item)">Details</a>&nbsp;
+            <a href="javascript: void(0);" ng-click="$ctrl.resend(item)">Try again</a>&nbsp;
             <a href="javascript: void(0);" ng-click="$ctrl.delete(item)">Delete</a>
         </th>
     </tr>

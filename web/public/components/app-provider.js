@@ -17,6 +17,9 @@ module.exports = {
             },
             delete(_id) {                
                 return $http.delete(`${$config.services.mail}/mail/${_id}`).catch(UtilsService.throwError);
+            },
+            resend(_id) {                
+                return $http.put(`${$config.services.mail}/mail/${_id}`).catch(UtilsService.throwError);
             }   
         }
     }]

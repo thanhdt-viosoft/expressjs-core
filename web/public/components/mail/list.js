@@ -24,6 +24,12 @@ module.exports = {
             });
         }
 
+        this.resend = (item) => {
+            Mail.resend(item._id).then((resp) => {
+               this.loadData(); 
+            });
+        }
+
         this.loadData();
     }]
 }

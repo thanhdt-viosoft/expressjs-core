@@ -207,6 +207,9 @@ webpackJsonp([2],[
 	            },
 	            delete: function _delete(_id) {
 	                return $http.delete($config.services.mail + '/mail/' + _id).catch(UtilsService.throwError);
+	            },
+	            resend: function resend(_id) {
+	                return $http.put($config.services.mail + '/mail/' + _id).catch(UtilsService.throwError);
 	            }
 	        };
 	    }]
@@ -618,6 +621,12 @@ webpackJsonp([2],[
 	            });
 	        };
 
+	        this.resend = function (item) {
+	            Mail.resend(item._id).then(function (resp) {
+	                _this.loadData();
+	            });
+	        };
+
 	        this.loadData();
 	    }]
 	};
@@ -626,7 +635,7 @@ webpackJsonp([2],[
 /* 19 */
 /***/ function(module, exports) {
 
-	module.exports = "<dialog id=\"formDetails\">    \r\n    <a href=\"javascript:void(0)\" close-modal=\"#formDetails\" class=\"close\">[X]</a>\r\n    <h1>Mail information</h1>\r\n    <div>\r\n        <h3>{{$ctrl.mail.title}}</h3>\r\n        <p ng-if=\"$ctrl.mail.html\" ng-bind-html-unsafe=\"$ctrl.mail.content\"></p>\r\n        <p ng-if=\"!$ctrl.mail.html\"><pre>{{$ctrl.mail.content}}</pre></p>\r\n        <div ng-if=\"$ctrl.mail.to\">To: [ <a href=\"mailto:{{to}}\" ng-repeat=\"to in $ctrl.mail.to\">{{to}}</a> ]</div>\r\n        <div ng-if=\"$ctrl.mail.cc\">CC: [ <a href=\"mailto:{{cc}}\" ng-repeat=\"cc in $ctrl.mail.cc\">{{cc}}</a> ]</div>\r\n        <div ng-if=\"$ctrl.mail.bcc\">BCC: [ <a href=\"mailto:{{bcc}}\" ng-repeat=\"bcc in $ctrl.mail.bcc\">{{bcc}}</a> ]</div>\r\n        <p>\r\n            Attachments: <a href=\"{{$ctrl.apiUrl}}{{att.path}}\" ng-repeat=\"att in $ctrl.mail.attachments\">{{att.name}}</a>\r\n        </p>\r\n        <p>Sender: <b>{{$ctrl.mail.config_name}}</b></p>\r\n    </div>\r\n</dialog>\r\n<table class=\"table\" width=\"100%\">\r\n    <thead>\r\n        <tr>\r\n            <th></th>\r\n            <th>Title</th>        \r\n            <th>\r\n                <select ng-model=\"$ctrl.filterStatus\" ng-change=\"$ctrl.loadData()\">\r\n                    <option value=\"\">Status (All)</option>\r\n                    <option value=\"0\" class=\"warn\">Pending</option>\r\n                    <option value=\"1\" class=\"error\">Error</option>\r\n                    <option value=\"2\" class=\"error\">Failed</option>\r\n                    <option value=\"3\" class=\"pass\">Done</option>\r\n                </select>\r\n            </th>\r\n            <th>Sender</th>\r\n            <th>Created date</th>\r\n            <th></th>\r\n        </tr>\r\n    </thead>\r\n    <tbody>\r\n    <tr ng-repeat=\"item in $ctrl.mails\">\r\n        <th>{{$index+1}}. </th>\r\n        <td>{{item.title}}</td>\r\n        <td title=\"{{item.msg}}\" ng-class=\"{warn: item.status == 0, error: (item.status == 1 || item.status == 2), pass: item.status === 3}\">{{item.status | status}}{{item.status === 1 ? (' (' + item.trying + ')') : ''}}</td>        \r\n        <td>{{item.config_name}}</td>\r\n        <td class=\"date\">{{item.updated_at | date:'yyyy-MM-dd HH:mm'}}</td>\r\n        <th>\r\n            <a href=\"javascript: void(0);\" open-modal=\"#formDetails\" ng-click=\"$ctrl.details(item)\">Details</a>\r\n            <a href=\"javascript: void(0);\" ng-click=\"$ctrl.delete(item)\">Delete</a>\r\n        </th>\r\n    </tr>\r\n    </tbody>\r\n</table>";
+	module.exports = "<dialog id=\"formDetails\">    \r\n    <a href=\"javascript:void(0)\" close-modal=\"#formDetails\" class=\"close\">[X]</a>\r\n    <h1>Mail information</h1>\r\n    <div>\r\n        <h3>{{$ctrl.mail.title}}</h3>\r\n        <p ng-if=\"$ctrl.mail.html\" ng-bind-html-unsafe=\"$ctrl.mail.content\"></p>\r\n        <p ng-if=\"!$ctrl.mail.html\"><pre>{{$ctrl.mail.content}}</pre></p>\r\n        <div ng-if=\"$ctrl.mail.to\">To: [ <a href=\"mailto:{{to}}\" ng-repeat=\"to in $ctrl.mail.to\">{{to}}</a> ]</div>\r\n        <div ng-if=\"$ctrl.mail.cc\">CC: [ <a href=\"mailto:{{cc}}\" ng-repeat=\"cc in $ctrl.mail.cc\">{{cc}}</a> ]</div>\r\n        <div ng-if=\"$ctrl.mail.bcc\">BCC: [ <a href=\"mailto:{{bcc}}\" ng-repeat=\"bcc in $ctrl.mail.bcc\">{{bcc}}</a> ]</div>\r\n        <p>\r\n            Attachments: <a href=\"{{$ctrl.apiUrl}}{{att.path}}\" ng-repeat=\"att in $ctrl.mail.attachments\">{{att.name}}</a>\r\n        </p>\r\n        <p>Sender: <b>{{$ctrl.mail.config_name}}</b></p>\r\n    </div>\r\n</dialog>\r\n<table class=\"table\" width=\"100%\">\r\n    <thead>\r\n        <tr>\r\n            <th></th>\r\n            <th>Title</th>        \r\n            <th>\r\n                <select ng-model=\"$ctrl.filterStatus\" ng-change=\"$ctrl.loadData()\">\r\n                    <option value=\"\">Status (All)</option>\r\n                    <option value=\"0\" class=\"warn\">Pending</option>\r\n                    <option value=\"1\" class=\"error\">Error</option>\r\n                    <option value=\"2\" class=\"error\">Failed</option>\r\n                    <option value=\"3\" class=\"pass\">Done</option>\r\n                </select>\r\n            </th>\r\n            <th>Sender</th>\r\n            <th>Created date</th>\r\n            <th></th>\r\n        </tr>\r\n    </thead>\r\n    <tbody>\r\n    <tr ng-repeat=\"item in $ctrl.mails\">\r\n        <th>{{$index+1}}. </th>\r\n        <td>{{item.title}}</td>\r\n        <td title=\"{{item.msg}}\" ng-class=\"{warn: item.status == 0, error: (item.status == 1 || item.status == 2), pass: item.status === 3}\">{{item.status | status}}{{item.status === 1 ? (' (' + item.trying + ')') : ''}}</td>        \r\n        <td>{{item.config_name}}</td>\r\n        <td class=\"date\">{{item.updated_at | date:'yyyy-MM-dd HH:mm'}}</td>\r\n        <th>\r\n            <a href=\"javascript: void(0);\" open-modal=\"#formDetails\" ng-click=\"$ctrl.details(item)\">Details</a>&nbsp;\r\n            <a href=\"javascript: void(0);\" ng-click=\"$ctrl.resend(item)\">Try again</a>&nbsp;\r\n            <a href=\"javascript: void(0);\" ng-click=\"$ctrl.delete(item)\">Delete</a>\r\n        </th>\r\n    </tr>\r\n    </tbody>\r\n</table>";
 
 /***/ },
 /* 20 */
