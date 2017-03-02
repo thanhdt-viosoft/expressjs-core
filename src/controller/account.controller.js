@@ -24,9 +24,7 @@ app.get('/account', utils.auth(`${global.appconfig.name}>account`, 'FIND'), asyn
 				updated_at: -1
 			},
 			$fields: {
-				password: 0,
-				status: 0,
-				app: 0
+				password: 0
 			}
 		});
 		res.send(rs);
@@ -43,9 +41,7 @@ app.get('/account/:_id', utils.auth(`${global.appconfig.name}>account`, 'GET'), 
 				project_id: req.auth.projectId
 			},
 			$fields: {
-				password: 0,
-				status: 0,
-				app: 0
+				password: 0
 			}
 		});
 		res.send(rs);

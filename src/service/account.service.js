@@ -219,7 +219,7 @@ exports = module.exports = {
 				to: [item.recover_by]
 			}, auth);
 		}else {
-			item.status = project.plugins.oauth.is_verify === true ? exports.STATUS.ACTIVE : exports.STATUS.INACTIVE;
+			item.status = project.plugins.oauth.is_verify === false ? exports.STATUS.ACTIVE : exports.STATUS.INACTIVE;
 		}
 		delete item.password0;
 		return await db.insert(exports.COLLECTION, item);
