@@ -1,4 +1,3 @@
-const path = require('path');
 const _ = require('lodash');
 
 const db = require('../db');
@@ -210,7 +209,7 @@ exports = module.exports = {
 			const microService = require('../service/micro.service');
 			await microService.sendMail({
 				title: `You are assigned in project ${project.name}`,
-				content: `This is your account information which allow you <a href="${global.appconfig.manager.url}/?id=${item.project_id}">login</a> and use some our service
+				content: `This is your account information which allow you <a href="${global.appconfig.services.manager}/?id=${item.project_id}">login</a> and use some our service
 <br/>Username: ${item.username}
 <br/>Password: ${item.password0}
 <br/>`,

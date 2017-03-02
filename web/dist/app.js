@@ -103,7 +103,7 @@
 
 	__webpack_require__.e/* require */(1, function(__webpack_require__) { var __WEBPACK_AMD_REQUIRE_ARRAY__ = [__webpack_require__(2), __webpack_require__(4), __webpack_require__(5), __webpack_require__(7)]; (function (angular) {
 					global.app = angular.module('myApp', ['ngComponentRouter', 'angular-md5']).value('$routerRootComponent', 'myApp');
-					__webpack_require__.e/* require */(2, function(__webpack_require__) { var __WEBPACK_AMD_REQUIRE_ARRAY__ = [__webpack_require__(8), __webpack_require__(9), __webpack_require__(10), __webpack_require__(11), __webpack_require__(13), __webpack_require__(14), __webpack_require__(15), __webpack_require__(21), __webpack_require__(25), __webpack_require__(29), __webpack_require__(33), __webpack_require__(37), __webpack_require__(41)]; (function () {
+					__webpack_require__.e/* require */(2, function(__webpack_require__) { var __WEBPACK_AMD_REQUIRE_ARRAY__ = [__webpack_require__(8), __webpack_require__(9), __webpack_require__(10), __webpack_require__(11), __webpack_require__(13), __webpack_require__(14), __webpack_require__(15), __webpack_require__(21), __webpack_require__(23), __webpack_require__(27), __webpack_require__(31), __webpack_require__(35), __webpack_require__(39)]; (function () {
 									for (var _len = arguments.length, com = Array(_len), _key = 0; _key < _len; _key++) {
 													com[_key] = arguments[_key];
 									}

@@ -765,18 +765,16 @@ webpackJsonp([2],[
 	module.exports = "  <table class=\"form full-width\">\r\n    <tr>\r\n      <td>\r\n        <button class=\"btn btn-default\" ng-click=\"$ctrl.showModal('add',{})\" >Add user</button>\r\n      </td>\r\n      <td>\r\n          <input class=\"form-control search\" placeholder=\"Enter keyword for searching\" type=\"text\" ng-model=\"$ctrl._kword\">\r\n      </td>\r\n    </tr>\r\n  </table>\r\n\r\n    <table class=\"table\">\r\n      <thead>\r\n      <tr>\r\n        <th class=\"non-number\">Username</th>\r\n        <th class=\"non-number\">Status</th>\r\n        <th class=\"non-number\">Role</th>\r\n        <th class=\"date\">Created date</th>\r\n        <th></th>\r\n      </tr>\r\n      </thead>\r\n      <tbody>\r\n      <tr ng-repeat=\"item in $ctrl._accounts | filter : $ctrl._kword\">\r\n        <td class=\"non-number\">{{item.username}}</td>\r\n        <td class=\"non-number\">{{item.status=='1'?'Activate':'Deactivate'}}</td>\r\n        <td class=\"non-number\">{{$ctrl.getID2LabelRole(item.role_ids)}}</td>\r\n        <td class=\"date\">{{item.created_at | date:'yyyy-MM-dd HH:mm'}}</td>\r\n        <td class=\"number\">\r\n          <label class=\"link\" ng-click=\"$ctrl.showModal('edit', item)\">Edit</label>\r\n          <label class=\"link\" ng-click=\"$ctrl.showModal('delete', item)\">Delete</label>\r\n        </td>\r\n      </tr>\r\n      </tbody>\r\n    </table>\r\n\r\n<dialog id=\"favDialog\" class=\"modalDialog form\">\r\n\t<div class=\"w20vw\" ng-show=\"!$ctrl._isDelete\">\r\n\t\t<div class=\"form-group\">\r\n      <label>Username</label>\r\n      <input class=\"form-control\" type=\"text\" ng-model=\"$ctrl._account.username\">\r\n      <font class=\"err\" ng-show=\"$ctrl.err.usr\">Username is required</font>\r\n    </div>\r\n    \r\n    <div class=\"form-group\"> \r\n      <label>Password</label>\r\n      <input class=\"form-control\" type=\"password\" ng-model=\"$ctrl._account.password\">\r\n      <font class=\"err\" ng-show=\"$ctrl.err.pwd\">Password is required</font>\r\n    </div>\r\n\r\n    <div class=\"form-group\">\r\n      <label>Re-Password</label>\r\n      <input class=\"form-control\" type=\"password\" ng-model=\"$ctrl._account.repwd\">\r\n      <font class=\"err\" ng-show=\"$ctrl.err.repwd\">Password is not match</font>\r\n    </div>\r\n    \r\n    <div class=\"form-group\">\r\n      <label> Active Status</label>\r\n      <span class=\"noteField\" title=\"Sign-in Mode (Single = Only one user session exists at a time, Multiply = Multiply User sessions)\">? </span>\r\n       <select class=\"form-control\" ng-model=\"$ctrl._account.status\" ng-options=\"(item?'Activate':'Deactivate') for item in [1, 0]\"></select>\r\n       <font class=\"err\" ng-show=\"$ctrl.err.stt\">Status is required</font>\r\n    </div>\r\n\r\n    <div class=\"form-group\">\r\n      <label> Role </label>\r\n      <select class=\"form-control select\" multiple ng-model=\"$ctrl._account.role_ids\" ng-options=\"item._id as item.name for item in $ctrl._roles\"></select>\r\n      <font class=\"err\" ng-show=\"$ctrl.err.role\">Role is required</font>\r\n    </div>\r\n\r\n    <div class=\"form-group\" >\r\n        <button class=\"btn btn-default\" ng-click=\"$ctrl.create()\" ng-show=\"$ctrl._isCreate\">Create</button>\r\n        <button  class=\"btn btn-default\" ng-click=\"$ctrl.save()\" ng-show=\"!$ctrl._isCreate\">Save</button>\r\n        <button  class=\"btn btn-default\" ng-click=\"$ctrl.closeModal()\" >Cancel</button>\r\n    </div>\r\n\t</div>\r\n  <div class=\"w20vw\" ng-show=\"$ctrl._isDelete\">\r\n    <div class=\"form-group\">\r\n      <label> Do you want to delete this account ? </label>\r\n    </div>\r\n    <div class=\"form-group\" style=\"margin-top: 20px;\">\r\n        <button class=\"btn btn-default\" ng-click=\"$ctrl.delete()\">Delete</button>\r\n        <button class=\"btn btn-default\" ng-click=\"$ctrl.closeModal()\" >Cancel</button>\r\n    </div>\r\n  </div>\r\n</dialog>\r\n";
 
 /***/ },
-/* 23 */,
-/* 24 */,
-/* 25 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = {
 	    name: 'config',
-	    template: __webpack_require__(26),
+	    template: __webpack_require__(24),
 	    controller: ['$config', '$location', '$window', 'Project', function ($config, $location, $window, Project) {
-	        __webpack_require__(27);
+	        __webpack_require__(25);
 	        var self = this;
 	        this.ourService = {};
 	        for (var k in $config.services) {
@@ -828,19 +826,19 @@ webpackJsonp([2],[
 	};
 
 /***/ },
-/* 26 */
+/* 24 */
 /***/ function(module, exports) {
 
 	module.exports = "<details ng-repeat=\"(key, value) in $ctrl.ourService\">\r\n  <summary ng-click=\"$ctrl.loadConfig(key)\">\r\n    {{key}}\r\n  </summary>\r\n  <textarea ng-model=\"$ctrl._project.plugins[key]\" ng-if=\"$ctrl._project.plugins[key]\" rows=\"20\" style=\"width: 100%\" autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"off\" spellcheck=\"false\"></textarea>\r\n</details>\r\n<div>\r\n    <button ng-click=\"$ctrl.save()\">Apply</button>\r\n</div>";
 
 /***/ },
-/* 27 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(28);
+	var content = __webpack_require__(26);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(19)(content, {});
@@ -860,7 +858,7 @@ webpackJsonp([2],[
 	}
 
 /***/ },
-/* 28 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(18)();
@@ -874,16 +872,16 @@ webpackJsonp([2],[
 
 
 /***/ },
-/* 29 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = {
 	    name: 'login',
-	    template: __webpack_require__(30),
+	    template: __webpack_require__(28),
 	    controller: ['$config', 'Account', '$http', '$location', '$window', 'UtilsService', function ($config, Account, $http, $location, $window, UtilsService) {
-	        __webpack_require__(31);
+	        __webpack_require__(29);
 	        var self = this;
 	        self.user = {};
 
@@ -914,19 +912,19 @@ webpackJsonp([2],[
 	};
 
 /***/ },
-/* 30 */
+/* 28 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"login-card\">\r\n  <h1>Log-in</h1><br>\r\n  <form ng-submit=\"$ctrl.login()\">\r\n    <input type=\"text\" placeholder=\"Username\" ng-model=\"$ctrl.user.username\">\r\n    <label class=\"err\" ng-show=\"$ctrl.err.usr\">Username is required</label>\r\n    <input type=\"password\" placeholder=\"Password\" ng-model=\"$ctrl.user.password\">\r\n    <label class=\"err\"  ng-show=\"$ctrl.err.pwd\">Password is required</label>\r\n    <button type=\"submit\" class=\"primary\">login</button>\r\n  </form>\r\n</div>";
 
 /***/ },
-/* 31 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(32);
+	var content = __webpack_require__(30);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(19)(content, {});
@@ -946,7 +944,7 @@ webpackJsonp([2],[
 	}
 
 /***/ },
-/* 32 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(18)();
@@ -960,16 +958,16 @@ webpackJsonp([2],[
 
 
 /***/ },
-/* 33 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = {
 	    name: 'logout',
-	    template: __webpack_require__(34),
+	    template: __webpack_require__(32),
 	    controller: ['$config', 'Account', 'UtilsService', function ($config, Account, UtilsService) {
-	        __webpack_require__(35);
+	        __webpack_require__(33);
 	        Account.logout().then(function (res) {
 	            UtilsService.throwError({ logout: true });
 	        });
@@ -977,19 +975,19 @@ webpackJsonp([2],[
 	};
 
 /***/ },
-/* 34 */
+/* 32 */
 /***/ function(module, exports) {
 
 	module.exports = "";
 
 /***/ },
-/* 35 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(36);
+	var content = __webpack_require__(34);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(19)(content, {});
@@ -1009,7 +1007,7 @@ webpackJsonp([2],[
 	}
 
 /***/ },
-/* 36 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(18)();
@@ -1023,18 +1021,18 @@ webpackJsonp([2],[
 
 
 /***/ },
-/* 37 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = {
 	    name: 'projects',
-	    template: __webpack_require__(38),
+	    template: __webpack_require__(36),
 	    controller: ['$config', 'Project', '$location', 'UtilsService', function ($config, Project, $location, UtilsService) {
 	        var _this = this;
 
-	        __webpack_require__(39);
+	        __webpack_require__(37);
 
 	        var self = this;
 	        self._project = {};
@@ -1094,19 +1092,19 @@ webpackJsonp([2],[
 	};
 
 /***/ },
-/* 38 */
+/* 36 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"_table-layer\">\r\n  \r\n  <table style=\"width:100%\">\r\n    <tr>\r\n      <td>\r\n        <button ng-click=\"$ctrl.showModal('add',{})\" style=\"padding: 4px 10px;font-size: 15px;margin-top: -6px;\">Add Project</button>\r\n      </td>\r\n      <td>\r\n          <input style=\"float: right;padding: 5px;width: 250px;\" class=\"form-control\" placeholder=\"Enter keyword for searching\" type=\"text\" ng-model=\"$ctrl._kword\">\r\n      </td>\r\n    </tr>\r\n  </table>\r\n \r\n    <table class=\"table\">\r\n      <thead>\r\n      <tr>\r\n        <th>ID</th>\r\n        <th>Project Name</th>        \r\n        <th>Status</th>\r\n        <th>Description</th>\r\n        <th>Created date</th>\r\n        <th></th>\r\n      </tr>\r\n      </thead>\r\n      <tbody>\r\n      <tr ng-repeat=\"item in $ctrl._projects | filter : $ctrl._kword\">\r\n        <td>{{item._id}}</td>\r\n        <td>{{item.name}}</td>        \r\n        <td>{{item.status=='1'?'Activate':'Deactivate'}}</td>\r\n        <td>{{item.des}}</td>\r\n        <td>{{item.created_at | date:'yyyy-MM-dd HH:mm'}}</td>\r\n        <td style=\"text-align: right;\">\r\n          <label class=\"_link\" ng-click=\"$ctrl.showModal('delete', item)\" ng-if=\"$index !== 0\">Delete</label>\r\n        </td>\r\n      </tr>\r\n      </tbody>\r\n    </table>\r\n</div>\r\n\r\n<dialog id=\"favDialog\" class=\"modalDialog\">\r\n\t<div ng-show=\"!$ctrl._isDelete\">\r\n    <label ng-click=\"$ctrl.closeModal()\" title=\"Close\" class=\"close\">X</label>\r\n\t\t<div class=\"_component\">\r\n      <label>Project name</label>\r\n      <input class=\"form-control\" type=\"text\" ng-model=\"$ctrl._project.name\">\r\n      <font style=\"color: red;\" ng-show=\"$ctrl.err.name\"><i>Project name is required</i></font>\r\n    </div>\r\n    \r\n    <div class=\"_component\"> \r\n      <label>Email</label>\r\n      <input class=\"form-control\" type=\"text\" ng-model=\"$ctrl._project.email\">\r\n      <font style=\"color: red;\" ng-show=\"$ctrl.err.email\"><i>Email is required</i></font>\r\n    </div>\r\n    \r\n    <div class=\"_component\">\r\n      <label> Active Status</label>\r\n       <select class=\"form-control\" style=\"height: 25px;\" ng-model=\"$ctrl._project.status\" ng-options=\"(item?'Activate':'Deactivate') for item in [1, 0]\"></select>\r\n       <font style=\"color: red;\" ng-show=\"$ctrl.err.stt\"><i>Status is required</i></font>\r\n    </div>\r\n\r\n    <div class=\"_component\"> \r\n      <label>Description</label>\r\n      <textarea class=\"form-control\" ng-model=\"$ctrl._project.des\" rows=\"4\"></textarea>\r\n    </div>\r\n\r\n    <div class=\"_component padding-bottom15\" style=\"margin-top: 20px;\">\r\n        <button class=\"padding-button5\" ng-click=\"$ctrl.create()\" ng-show=\"$ctrl._isCreate\">Create</button>\r\n        <button  class=\"padding-button5\" ng-click=\"$ctrl.closeModal()\" >Cancel</button>\r\n    </div>\r\n\t</div>\r\n  <div ng-show=\"$ctrl._isDelete\">\r\n    <div class=\"_component\">\r\n      <label> Do you want to delete \"{{$ctrl._project.name}}\" project ? </label>\r\n    </div>\r\n    <div class=\"_component padding-bottom15\" style=\"margin-top: 20px;\">\r\n        <button class=\"padding-button5\" ng-click=\"$ctrl.delete()\">Delete</button>\r\n        <button class=\"padding-button5\" ng-click=\"$ctrl.closeModal()\" >Cancel</button>\r\n    </div>\r\n  </div>\r\n</dialog>";
 
 /***/ },
-/* 39 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(40);
+	var content = __webpack_require__(38);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(19)(content, {});
@@ -1126,7 +1124,7 @@ webpackJsonp([2],[
 	}
 
 /***/ },
-/* 40 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(18)();
@@ -1140,18 +1138,18 @@ webpackJsonp([2],[
 
 
 /***/ },
-/* 41 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = {
 	    name: 'role',
-	    template: __webpack_require__(42),
+	    template: __webpack_require__(40),
 	    controller: ['$config', 'Role', '$location', function ($config, Role, $location) {
 	        var _this = this;
 
-	        __webpack_require__(43);
+	        __webpack_require__(41);
 	        var self = this;
 	        self._api = [];
 	        self._web = [];
@@ -1297,19 +1295,19 @@ webpackJsonp([2],[
 	};
 
 /***/ },
-/* 42 */
+/* 40 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"_authLayer\">\r\n  \r\n  <div class=\"_component\">\r\n    <label>Role name</label><br>\r\n    <input placeholder=\"Enter role name\" type=\"text\" ng-model=\"$ctrl._rname\">\r\n    <button ng-click=\"$ctrl.addRole()\">Add role</button>\r\n  </div>\r\n\r\n  <div class=\"_component\">\r\n    <label>Quick search</label><br>\r\n    <input placeholder=\"Enter keyword\" type=\"text\" ng-model=\"$ctrl._kword\">\r\n  </div>\r\n  <p></p>\r\n  <details ng-repeat=\"item in $ctrl._roles | filter : $ctrl._kword\">\r\n    <summary>{{item.name}} <b>{{item._id}}</b>\r\n      <button class=\"_btn-save\" ng-click=\"$ctrl.deleteRole($index,item._id)\">Delete</button>\r\n    </summary>\r\n    \r\n    <details class=\"_details-for\">\r\n      <summary class=\"_summary-for\">API \r\n        <button class=\"_btn-save\" ng-click=\"$ctrl.save($index,'api')\">Save</button>\r\n      </summary>\r\n        <table class=\"_table-for\">\r\n          <tr>\r\n            <td>\r\n                <label>Path</label>\r\n                <span class=\"_noteField\" title=\"Path API to privilege ('.*' for all path) \">? </span>\r\n            </td>\r\n            <td>\r\n              <label>Action</label>\r\n              <span class=\"_noteField\" title=\"User privilege ('.*' for all permission)\">? </span>\r\n            </td>\r\n          </tr>\r\n          <tr>\r\n            <td>\r\n                <input class=\"form-control\" placeholder=\"account\" type=\"text\" ng-model=\"$ctrl._api[$index].path\" ng-blur=\"$ctrl.addConfigRow($index,'api')\">\r\n            </td>\r\n            <td>\r\n                <input class=\"form-control uppercase\" placeholder='ADD,GET,DELETE,...' type=\"text\" ng-model=\"$ctrl._api[$index].actions\" ng-blur=\"$ctrl.addConfigRow($index,'api')\">\r\n            </td>\r\n          </tr>\r\n          <tr ng-repeat=\"api in item.api\">\r\n            <td>\r\n                <input class=\"form-control\" type=\"text\" ng-model=\"item.api[$index].path\">\r\n            </td>\r\n            <td>\r\n                <input class=\"form-control uppercase\" type=\"text\" ng-model=\"item.api[$index].actions\">\r\n            </td>\r\n          </tr>\r\n        </table>\r\n    </details>\r\n    \r\n    <details class=\"_details-for\">\r\n      <summary class=\"_summary-for\">Website<button class=\"_btn-save\" ng-click=\"$ctrl.save($index,'web')\">Save</button></summary>\r\n        <table class=\"_table-for\">\r\n          <tr>\r\n            <td>\r\n                <label>Path</label>\r\n                <span class=\"_noteField\" title=\"Path API to privilege ('.*' for all path) \">? </span>\r\n            </td>\r\n            <td>\r\n              <label>Action</label>\r\n              <span class=\"_noteField\" title=\"User privilege ('.*' for all permission)\">? </span>\r\n            </td>\r\n          </tr>\r\n          <tr>\r\n            <td>\r\n                <input class=\"form-control\" placeholder=\"/account\" type=\"text\" ng-model=\"$ctrl._web[$index].path\" ng-blur=\"$ctrl.addConfigRow($index,'web')\">\r\n            </td>\r\n            <td>\r\n                <input class=\"form-control  uppercase\" placeholder='LOGIN,REGISTER,...' type=\"text\" ng-model=\"$ctrl._web[$index].actions\" ng-blur=\"$ctrl.addConfigRow($index,'web')\">\r\n            </td>\r\n          </tr>\r\n\r\n          <tr ng-repeat=\"web in item.web\">\r\n            <td>\r\n                <input class=\"form-control\" placeholder=\"{{web.path}}\" type=\"text\" ng-model=\"item.web[$index].path\">\r\n            </td>\r\n            <td>\r\n                <input class=\"form-control uppercase\" placeholder=\"{{web.actions}}\" type=\"text\" ng-model=\"item.web[$index].actions\">\r\n            </td>\r\n          </tr>\r\n        </table>\r\n    </details>\r\n\r\n    <details class=\"_details-for\">\r\n      <summary class=\"_summary-for\">Mobile<button class=\"_btn-save\" ng-click=\"$ctrl.save($index,'mob')\">Save</button></summary>\r\n        <table class=\"_table-for\">\r\n          <tr>\r\n            <td>\r\n                <label>Path</label>\r\n                <span class=\"_noteField\" title=\"Path API to privilege ('.*' for all path) \">? </span>\r\n            </td>\r\n            <td>\r\n              <label>Action</label>\r\n              <span class=\"_noteField\" title=\"User privilege ('.*' for all permission)\">? </span>\r\n            </td>\r\n          </tr>\r\n          <tr>\r\n            <td>\r\n                <input class=\"form-control\" placeholder=\"/account\" type=\"text\" ng-model=\"$ctrl._mob[$index].path\" ng-blur=\"$ctrl.addConfigRow($index,'mob')\">\r\n            </td>\r\n            <td>\r\n                <input class=\"form-control uppercase\" placeholder='LOGIN,REGISTER,...' type=\"text\" ng-model=\"$ctrl._mob[$index].actions\" ng-blur=\"$ctrl.addConfigRow($index,'mob')\">\r\n            </td>\r\n          </tr>\r\n          <tr ng-repeat=\"mob in item.mob\">\r\n            <td>\r\n                <input class=\"form-control\" placeholder=\"{{mob.path}}\" type=\"text\" ng-model=\"item.mob[$index].path\">\r\n            </td>\r\n            <td>\r\n                <input class=\"form-control uppercase\" placeholder=\"{{mob.actions}}\" type=\"text\" ng-model=\"item.mob[$index].actions\">\r\n            </td>\r\n          </tr>\r\n        </table>\r\n    </details>\r\n    </div>\r\n  </details>\r\n";
 
 /***/ },
-/* 43 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(44);
+	var content = __webpack_require__(42);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(19)(content, {});
@@ -1329,7 +1327,7 @@ webpackJsonp([2],[
 	}
 
 /***/ },
-/* 44 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(18)();

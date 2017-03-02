@@ -9,12 +9,12 @@ const httpService = require('./http.service');
 
 exports = module.exports = {
     async checkAuthoriz(headers) {
-        return await httpService.head(`${global.appconfig.auth.url}/authoriz`, {
+        return await httpService.head(`${global.appconfig.services.auth}/authoriz`, {
             headers: headers
         })        
     },
     async updateConfig(auth, data) {
-        const resp = await httpService.put(`${global.appconfig.auth.url}/config`, {
+        const resp = await httpService.put(`${global.appconfig.services.auth}/config`, {
             headers: {
                 token: auth.rawToken,
                 path: '/config',
@@ -25,7 +25,7 @@ exports = module.exports = {
         return resp;
     },
     async getConfig(auth, pluginName) {
-        const resp = await httpService.get(`${global.appconfig.auth.url}/config`, {
+        const resp = await httpService.get(`${global.appconfig.services.auth}/config`, {
             headers: {
                 token: auth.rawToken,
                 path: '/config',
@@ -39,7 +39,7 @@ exports = module.exports = {
         throw resp.body;
     },
     async sendMail(data, auth){
-        const resp = await httpService.post(`${global.appconfig.mail.url}/mail`, {
+        const resp = await httpService.post(`${global.appconfig.services.mail}/mail`, {
             data,
             headers: {
                 token: auth.rawToken,
