@@ -30,6 +30,7 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "js-beautify": "^1.6.4"
+    "js-beautify": "^1.6.4",
+    "optimize-js-plugin": "0.0.4"
   }
 }
