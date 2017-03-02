@@ -1,4 +1,22 @@
 module.exports = {
+  openModal : ['$location', function ($location) {
+    return {
+      link: function (scope, element, attributes) {
+        element.on("click", () => {
+          document.querySelector(attributes.openModal).showModal();
+        })
+      }
+    };
+  }],
+  closeModal : ['$location', function ($location) {
+    return {
+      link: function (scope, element, attributes) {
+        element.on("click", () => {
+          document.querySelector(attributes.closeModal).close();
+        })
+      }
+    };
+  }],
   goTo : ['$location', function ($location) {
     return {
       link: function (scope, element, attributes) {

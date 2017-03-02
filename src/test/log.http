@@ -1,14 +1,15 @@
 {
 	des: 'Add',
 	method: 'POST',
-	url: 'http://localhost:9605/log',
+	url: 'http://localhost:9603/log',
 	requestHeader: {
 		'content-type': 'application/json',
-		secret_key: '589d95c4c392f347c4d3c9f9'
+		secret_key: '58a714841ca4c40a38ae2128'
 	},
 	requestBody: {
 		event_type: 10,
-		name: "ADD"
+		name: "Add new instance",
+		status: 0
 	}
 }
 

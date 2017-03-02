@@ -1,0 +1,29 @@
+<dialog id="formDetails">    
+    <a href="javascript:void(0)" close-modal="#formDetails" class="close">[X]</a>
+    <h1>Log details</h1>
+    <div>
+        <div ng-repeat="(key, value) in $ctrl.log">
+            <b>{{key}}</b>
+            <span>{{value}}</span>
+        </div>        
+    </div>
+</dialog>
+<table class="table" width="100%">
+    <thead>
+        <tr>
+            <th></th>
+            <th ng-repeat="label in $ctrl.fields">{{label}}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="item in $ctrl.logs">
+        <th>{{$index+1}}. </th>
+        <td ng-repeat="label in $ctrl.fields">{{item[label]}}</td>        
+        <td class="date">{{item.updated_at | date:'yyyy-MM-dd HH:mm'}}</td>
+        <th>
+            <a href="javascript: void(0);" open-modal="#formDetails" ng-click="$ctrl.details(item)">Details</a>
+        </th>
+    </tr>
+    </tbody>
+</table>

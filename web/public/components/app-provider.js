@@ -7,26 +7,15 @@ module.exports = {
             }
         }
     }],
-    Project: ['$http', '$rootScope', '$config', '$window', '$location', 'UtilsService', function($http, $rootScope, $config, $window, $location, UtilsService) {
+    Log: ['$http', '$rootScope', '$config', 'UtilsService', function ($http, $rootScope, $config, UtilsService) {
         return {
-            config(key) {
-                return $http.post(`${$config.services[key]}/config`).catch(UtilsService.throwError);
-            },
-            get: () => {
-                return $http.get(`${$config.services.oauth}/project`).catch(UtilsService.throwError);
-            },
-            add: (data) => {
-                return $http.post(`${$config.services.oauth}/project`, data).catch(UtilsService.throwError);
-            },
-            update: (data) => {
-                return $http.put(`${$config.services.oauth}/project`, data).catch(UtilsService.throwError);
-            },
-            getDetail(id) {
-                return $http.get(`${$config.services.oauth}/project/${id}`).catch(UtilsService.throwError);
-            },
-            delete(id) {
-                return $http.delete(`${$config.services.oauth}/project/${id}`).catch(UtilsService.throwError);
-            }
-        };
+            find(status) {
+                let q = {};
+                if(status) {
+                    q.status = status;
+                }
+                return $http.get(`${$config.services.log}/log?q=${JSON.stringify(q)}`).catch(UtilsService.throwError);
+            }  
+        }
     }]
 }
