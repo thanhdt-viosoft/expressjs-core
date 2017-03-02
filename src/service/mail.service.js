@@ -213,6 +213,13 @@ exports = module.exports = {
 		return rs;
 	},
 
+	async resend(item) {
+		item.trying_time = 1;
+		item.status = exports.STATUS.PENDING;
+		const rs = await db.update(exports.COLLECTION, item);
+		return rs;
+	},
+
 	async delete(_id) {
 		_id = exports.validate(_id, exports.VALIDATE.DELETE);
 		const item = await db.get(exports.COLLECTION, _id);

@@ -70,7 +70,7 @@ app.post('/attachments', bodyHandler.fileHandler({
 	} catch (err) {
 		next(err);
 	}
-})
+});
 
 app.post('/mail', bodyHandler.jsonHandler({
 	title: String,
@@ -89,7 +89,20 @@ app.post('/mail', bodyHandler.jsonHandler({
 	} catch (err) {
 		next(err);
 	}
-})
+});
+
+app.put('/mail/:_id', utils.auth(`${global.appconfig.name}>mail`, 'RESEND'), async(req, res, next) => {
+	try {
+		const mail = {
+			_id: db.uuid(req.params._id),
+			project_id: req.auth.projectId
+		};
+		const rs = await mailService.resend(mail);
+		res.send(rs);
+	} catch (err) {
+		next(err);
+	}
+});
 
 app.delete('/mail/:_id', utils.auth(`${global.appconfig.name}>mail`, 'DELETE'), async(req, res, next) => {
 	try {
@@ -102,4 +115,4 @@ app.delete('/mail/:_id', utils.auth(`${global.appconfig.name}>mail`, 'DELETE'), 
 	} catch (err) {
 		next(err);
 	}
-})
+});
