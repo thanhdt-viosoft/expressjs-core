@@ -56,7 +56,7 @@ app.post('/log', bodyHandler.jsonHandler(), utils.auth(`${global.appconfig.name}
 		let body = {};
 		body.project_id = req.auth.projectId;
 		body.account_id = req.auth.accountId;
-		if (req.body) body = _.merge({}, req.body, body);
+		body = _.merge({}, req.body, body);
 		const rs = await logService.insert(body);
 		res.send(rs);
 	} catch (err) {
@@ -75,7 +75,7 @@ app.put('/log/:_id', bodyHandler.jsonHandler(), utils.auth(`${global.appconfig.n
 			_id: db.uuid(req.params._id),
 			project_id: req.auth.projectId
 		};
-		if (req.body) body = _.merge({}, req.body, body);
+		body = _.merge({}, req.body, body);
 		const rs = await logService.update(body);
 		res.send(rs);
 	} catch (err) {
@@ -88,7 +88,7 @@ app.delete('/log/:_id', utils.auth(`${global.appconfig.name}>log`, 'DELETE'), as
 		const rs = await logService.delete({
 			_id: db.uuid(req.params._id),
 			project_id: req.auth.projectId			
-		}, req.auth);
+		});
 		res.send(rs);
 	} catch (err) {
 		next(err);

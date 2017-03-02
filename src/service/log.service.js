@@ -52,46 +52,33 @@ exports = module.exports = {
 		return item;
 	},
 
-	async find(fil = {}, dbo) {
+	async find(fil = {}) {
 		fil = exports.validate(fil, exports.VALIDATE.FIND);
-
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.find(fil, dbo.isnew ? db.DONE : db.FAIL);
+		const rs = await db.find(exports.COLLECTION, fil);
 		return rs;
 	},
 
-	async get(_id, dbo) {
+	async get(_id) {
 		_id = exports.validate(_id, exports.VALIDATE.GET);
-
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.get(_id, dbo.isnew ? db.DONE : db.FAIL);
+		const rs = await db.get(exports.COLLECTION, _id);
 		return rs;
 	},
 
-	async insert(item, dbo) {
+	async insert(item) {
 		item = exports.validate(item, exports.VALIDATE.INSERT);
-
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.insert(item, dbo.isnew ? db.DONE : db.FAIL);
+		const rs = await db.insert(exports.COLLECTION, item);
 		return rs;
 	},
 
-	async update(item, dbo) {
+	async update(item) {
 		item = exports.validate(item, exports.VALIDATE.UPDATE);
-		
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.update(item, dbo.isnew ? db.DONE : db.FAIL);
-
+		const rs = await db.update(exports.COLLECTION, item);
 		return rs;
 	},
 
-	async delete(_id, dbo) {
+	async delete(_id) {
 		_id = exports.validate(_id, exports.VALIDATE.DELETE);
-
-		const dboType = dbo ? db.FAIL : db.DONE;
-		dbo = await db.open(exports.COLLECTION, dbo);
-		const rs = await dbo.delete(_id, dbo.isnew ? db.DONE : db.FAIL);
-
+		const rs = await db.delete(exports.COLLECTION, _id);
 		return rs;
 	}
 
