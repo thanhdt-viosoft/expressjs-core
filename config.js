@@ -13,5 +13,6 @@ exports.plugins = {
     config: { name: 'Config', link: `${exports.services.oauth}/dist/index.htm#!/config`, isMenu: true},
     account: { name: 'Account', link: `${exports.services.oauth}/dist/index.htm#!/account`, isMenu: true},
     role: { name: 'Role', link: `${exports.services.oauth}/dist/index.htm#!/role`, isMenu: true},
-    mail: { name: 'Mail', link: `${exports.services.mail}/dist/index.htm#!/`, isMenu: true}
+    mail: { name: 'Mail', link: `${exports.services.mail}/dist/index.htm#!/`, isMenu: true},
+    log: { name: 'Log', link: `${exports.services.log}/dist/index.htm#!/`, isMenu: true}
 };
