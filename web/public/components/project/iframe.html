@@ -1,0 +1,60 @@
+      <div class="modal-body form">
+        <form action="#" id="form" class="form-horizontal">
+          <input type="hidden" value="" name="book_id" ng-model="$ctrl._temp.id"/>
+          <div class="form-body">
+            <div class="form-group">
+              <label class="control-label col-md-3">Book ISBN</label>
+              <div class="col-md-9">
+                <input name="book_isbn" placeholder="Book ISBN" ng-model="$ctrl._temp.isbn" class="form-control" type="text">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label col-md-3">Book Title</label>
+              <div class="col-md-9">
+                <input name="book_title" placeholder="Book_title" class="form-control" type="text" ng-model="$ctrl._temp.title">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label col-md-3">Book Author</label>
+              <div class="col-md-9">
+								<input name="book_author" placeholder="Book Author" class="form-control" type="text" ng-model="$ctrl._temp.author">
+ 
+              </div>
+            </div>
+						<div class="form-group">
+							<label class="control-label col-md-3">Book Category</label>
+							<div class="col-md-9">
+								<input name="book_category" placeholder="Book Category" class="form-control" type="text" ng-model="$ctrl._temp.category">
+ 
+							</div>
+						</div>
+ 
+          </div>
+        </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="btnSave" ng-click="$ctrl.save()" class="btn btn-primary">Save</button>
+            <button type="reset" class="btn btn-danger" >Cancel</button>
+          </div>
+
+          <table  width="100%">
+            <tr>
+              <th>Book ID</th>
+              <th>Book ISBN</th>
+              <th>Book Title</th>
+              <th>Book Author</th>
+              <th>Book Category</th>
+              <th style="width:125px;">Action</th>
+            </tr>
+            <tr ng-repeat="d in $ctrl.data">
+                <td>{{d.id}}</td>
+                <td>{{d.isbn}}</td>
+                <td>{{d.title}}</td>
+                <td>{{d.author}}</td>
+                <td>{{d.category}}</td>
+                <td>
+                  <button class="btn btn-warning">Edit</button>
+                  <button class="btn btn-danger" >Delete</i></button>
+                </td>
+            </tr>
+        </table>

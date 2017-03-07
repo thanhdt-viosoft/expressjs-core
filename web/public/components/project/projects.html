@@ -1,0 +1,80 @@
+<div class="_table-layer">
+  
+  <table style="width:100%">
+    <tr>
+      <td>
+        <button ng-click="$ctrl.showModal('add',{})" style="padding: 4px 10px;font-size: 15px;margin-top: -6px;">Add Project</button>
+      </td>
+      <td>
+          <input style="float: right;padding: 5px;width: 250px;" class="form-control" placeholder="Enter keyword for searching" type="text" ng-model="$ctrl._kword">
+      </td>
+    </tr>
+  </table>
+ 
+    <table class="table">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Project Name</th>        
+        <th>Status</th>
+        <th>Description</th>
+        <th>Created date</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="item in $ctrl._projects | filter : $ctrl._kword">
+        <td>{{item._id}}</td>
+        <td>{{item.name}}</td>        
+        <td>{{item.status=='1'?'Activate':'Deactivate'}}</td>
+        <td>{{item.des}}</td>
+        <td>{{item.created_at | date:'yyyy-MM-dd HH:mm'}}</td>
+        <td style="text-align: right;">
+          <label class="_link" ng-click="$ctrl.showModal('delete', item)" ng-if="$index !== 0">Delete</label>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+</div>
+
+<dialog id="favDialog" class="modalDialog">
+	<div ng-show="!$ctrl._isDelete">
+    <label ng-click="$ctrl.closeModal()" title="Close" class="close">X</label>
+		<div class="_component">
+      <label>Project name</label>
+      <input class="form-control" type="text" ng-model="$ctrl._project.name">
+      <font style="color: red;" ng-show="$ctrl.err.name"><i>Project name is required</i></font>
+    </div>
+    
+    <div class="_component"> 
+      <label>Email</label>
+      <input class="form-control" type="text" ng-model="$ctrl._project.email">
+      <font style="color: red;" ng-show="$ctrl.err.email"><i>Email is required</i></font>
+    </div>
+    
+    <div class="_component">
+      <label> Active Status</label>
+       <select class="form-control" style="height: 25px;" ng-model="$ctrl._project.status" ng-options="(item?'Activate':'Deactivate') for item in [1, 0]"></select>
+       <font style="color: red;" ng-show="$ctrl.err.stt"><i>Status is required</i></font>
+    </div>
+
+    <div class="_component"> 
+      <label>Description</label>
+      <textarea class="form-control" ng-model="$ctrl._project.des" rows="4"></textarea>
+    </div>
+
+    <div class="_component padding-bottom15" style="margin-top: 20px;">
+        <button class="padding-button5" ng-click="$ctrl.create()" ng-show="$ctrl._isCreate">Create</button>
+        <button  class="padding-button5" ng-click="$ctrl.closeModal()" >Cancel</button>
+    </div>
+	</div>
+  <div ng-show="$ctrl._isDelete">
+    <div class="_component">
+      <label> Do you want to delete "{{$ctrl._project.name}}" project ? </label>
+    </div>
+    <div class="_component padding-bottom15" style="margin-top: 20px;">
+        <button class="padding-button5" ng-click="$ctrl.delete()">Delete</button>
+        <button class="padding-button5" ng-click="$ctrl.closeModal()" >Cancel</button>
+    </div>
+  </div>
+</dialog>
