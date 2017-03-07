@@ -32,6 +32,21 @@
 }
 
 {
+    method: 'PUT',
+    url: 'http://localhost:9600/me',
+    requestHeader: {
+        'content-type': 'application/json'
+    },
+    requestBody: {
+        password: md5(),
+        recover_by: 'email',
+        more: {
+            ...
+        }
+    }
+}
+
+{
 	method: 'POST',
 	url: 'http://localhost:9600/upload-image',
 	requestHeader: {

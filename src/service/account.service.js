@@ -78,6 +78,7 @@ exports = module.exports = {
 				checker.option('more', item.more, Object);
 
 				if(item.secret_key === true) item.secret_key = db.uuid();
+				else delete item.secret_key;
 
 				item.updated_at = new Date();
 

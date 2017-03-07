@@ -24,7 +24,8 @@ app.get('/account', utils.auth(`${global.appconfig.name}>account`, 'FIND'), asyn
 				updated_at: -1
 			},
 			$fields: {
-				password: 0
+				password: 0,
+				secret_key: 0
 			}
 		});
 		res.send(rs);
