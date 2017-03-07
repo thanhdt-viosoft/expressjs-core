@@ -1,0 +1,84 @@
+  <table class="form full-width">
+    <tr>
+      <td>
+        <button class="btn btn-default" ng-click="$ctrl.showModal('add',{})" >Add user</button>
+      </td>
+      <td>
+          <input class="form-control search" placeholder="Enter keyword for searching" type="text" ng-model="$ctrl._kword">
+      </td>
+    </tr>
+  </table>
+
+    <table class="table">
+      <thead>
+      <tr>
+        <th class="non-number">Username</th>
+        <th class="non-number">Status</th>
+        <th class="non-number">Role</th>
+        <th class="date">Created date</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="item in $ctrl._accounts | filter : $ctrl._kword">
+        <td class="non-number">{{item.username}}</td>
+        <td class="non-number">{{item.status=='1'?'Activate':'Deactivate'}}</td>
+        <td class="non-number">{{$ctrl.getID2LabelRole(item.role_ids)}}</td>
+        <td class="date">{{item.created_at | date:'yyyy-MM-dd HH:mm'}}</td>
+        <td class="number">
+          <label class="link" ng-click="$ctrl.showModal('edit', item)">Edit</label>
+          <label class="link" ng-click="$ctrl.showModal('delete', item)">Delete</label>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+<dialog id="favDialog" class="modalDialog form">
+	<div class="w20vw" ng-show="!$ctrl._isDelete">
+		<div class="form-group">
+      <label>Username</label>
+      <input class="form-control" type="text" ng-model="$ctrl._account.username">
+      <font class="err" ng-show="$ctrl.err.usr">Username is required</font>
+    </div>
+    
+    <div class="form-group"> 
+      <label>Password</label>
+      <input class="form-control" type="password" ng-model="$ctrl._account.password">
+      <font class="err" ng-show="$ctrl.err.pwd">Password is required</font>
+    </div>
+
+    <div class="form-group">
+      <label>Re-Password</label>
+      <input class="form-control" type="password" ng-model="$ctrl._account.repwd">
+      <font class="err" ng-show="$ctrl.err.repwd">Password is not match</font>
+    </div>
+    
+    <div class="form-group">
+      <label> Active Status</label>
+      <span class="noteField" title="Sign-in Mode (Single = Only one user session exists at a time, Multiply = Multiply User sessions)">? </span>
+       <select class="form-control" ng-model="$ctrl._account.status" ng-options="(item?'Activate':'Deactivate') for item in [1, 0]"></select>
+       <font class="err" ng-show="$ctrl.err.stt">Status is required</font>
+    </div>
+
+    <div class="form-group">
+      <label> Role </label>
+      <select class="form-control select" multiple ng-model="$ctrl._account.role_ids" ng-options="item._id as item.name for item in $ctrl._roles"></select>
+      <font class="err" ng-show="$ctrl.err.role">Role is required</font>
+    </div>
+
+    <div class="form-group" >
+        <button class="btn btn-default" ng-click="$ctrl.create()" ng-show="$ctrl._isCreate">Create</button>
+        <button  class="btn btn-default" ng-click="$ctrl.save()" ng-show="!$ctrl._isCreate">Save</button>
+        <button  class="btn btn-default" ng-click="$ctrl.closeModal()" >Cancel</button>
+    </div>
+	</div>
+  <div class="w20vw" ng-show="$ctrl._isDelete">
+    <div class="form-group">
+      <label> Do you want to delete this account ? </label>
+    </div>
+    <div class="form-group" style="margin-top: 20px;">
+        <button class="btn btn-default" ng-click="$ctrl.delete()">Delete</button>
+        <button class="btn btn-default" ng-click="$ctrl.closeModal()" >Cancel</button>
+    </div>
+  </div>
+</dialog>

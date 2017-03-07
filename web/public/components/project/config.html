@@ -1,0 +1,9 @@
+<details ng-repeat="(key, value) in $ctrl.ourService">
+  <summary ng-click="$ctrl.loadConfig(key)">
+    {{key}}
+  </summary>
+  <textarea ng-model="$ctrl._project.plugins[key]" ng-if="$ctrl._project.plugins[key]" rows="20" style="width: 100%" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+</details>
+<div>
+    <button ng-click="$ctrl.save()">Apply</button>
+</div>

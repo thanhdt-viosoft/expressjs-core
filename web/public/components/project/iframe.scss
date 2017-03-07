@@ -1,0 +1,23 @@
+ifrm {
+  .form-group {
+        margin-bottom: 10px;
+  }
+  .form-group label
+  {
+        font-weight: 700;
+  }
+  table {
+    border-spacing: 0px;
+    margin-top : 20px
+  }
+  table th{
+    text-align: left;
+    border-bottom: 2px solid #807C7C;
+  }
+  table td{
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    padding: 8px 2px;
+  }
+  
+}
