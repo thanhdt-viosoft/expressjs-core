@@ -11,6 +11,7 @@ global.appconfig = {
         log: 'http://localhost:9603'
     },
     app: {
+        encrypt: 0,
         rootProjectId: '58a714841ca4c40a38ae2125'
     },
     cache: {
@@ -18,6 +19,6 @@ global.appconfig = {
             host: 'localhost',
             port: 6379,
             opts: {}
-        }
+        }        
     }
 };

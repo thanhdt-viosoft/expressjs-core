@@ -13,11 +13,12 @@ const roleService = require('../service/role.service');
 
 app.get('/role', utils.auth(`${global.appconfig.name}>role`, 'FIND'), async(req, res, next) => {
 	try {
-		let where = {};
+		let where = req.query.q ? JSON.parse(req.query.q) : {};
+		let fields = req.query.f ? JSON.parse(req.query.f) : undefined;
 		where.project_id = req.auth.projectId;
-		where.is_nature = { $eq: null };
 		const rs = await roleService.find({
-			$where: where
+			$where: where,
+			$fields: fields
 		});
 		res.send(rs);
 	} catch (err) {
