@@ -4,6 +4,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
+const bodyHandler = require('./src/body.handler');
 
 const app = express();
 global.app = app;
@@ -24,6 +25,8 @@ app.use(cors());
 global.FileUpload = (config) => {
     return config;
 }
+
+app.use(bodyHandler.encrypt(6));
 
 const files = fs.readdirSync(path.join(__dirname, 'src', 'controller'));
 files.map((f) => {
