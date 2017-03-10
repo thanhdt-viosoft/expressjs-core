@@ -11,6 +11,7 @@ global.appconfig = {
         log: 'http://localhost:9603'
     },
     app: {
-        timeout_scan_email: 5000
+        timeout_scan_email: 60000,
+        encrypt: 0
     }
 };
