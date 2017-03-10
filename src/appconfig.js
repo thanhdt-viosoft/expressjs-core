@@ -7,6 +7,6 @@ global.appconfig = {
         url: 'amqp://127.0.0.1',
     },
     app: {
-        
+        encrypt: 0
     }
 };
