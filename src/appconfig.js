@@ -11,6 +11,6 @@ global.appconfig = {
         log: 'http://localhost:9603'
     },
     app: {
-        
+        encrypt: 0
     }
 };
